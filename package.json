@@ -18,5 +18,8 @@
   ],
   "author": "Razvan Botea <razvan@appscend.com>",
   "license": "GPLv3",
-  "private": true
+  "private": true,
+  "dependencies": {
+    "couchbase": "^2.0.6"
+  }
 }
