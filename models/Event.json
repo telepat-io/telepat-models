@@ -1,0 +1,40 @@
+{
+  "namespace": "event",
+  "properties": {
+    "id": {
+      "type": "integer",
+      "index": true
+    },
+    "created": {
+      "type": "integer"
+    },
+    "modified": {
+      "type": "integer"
+    },
+    "text": {
+      "type": "string"
+    },
+    "image": {
+      "type": "string"
+    },
+    "options": {
+      "type": "object"
+    },
+    "answers": {
+      "type": "object"
+    },
+    "comments_count": {
+      "type": "integer"
+    }
+  },
+  "relations": [
+    {
+      "type": "has_many",
+      "to": "Comment"
+    },
+    {
+      "type": "has_many",
+      "to": "Answer"
+    }
+  ]
+}
