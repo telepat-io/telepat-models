@@ -1,0 +1,22 @@
+{
+  "name": "octopus-models-api",
+  "version": "0.0.1",
+  "description": "Database models used in Beluga project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "ssh://git@freshweb.ro:7999/bel/octopus-models-lib.git"
+  },
+  "keywords": [
+    "octopus",
+    "beluga",
+    "api",
+    "models"
+  ],
+  "author": "Razvan Botea <razvan@appscend.com>",
+  "license": "GPLv3",
+  "private": true
+}
