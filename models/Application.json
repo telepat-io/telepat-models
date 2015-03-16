@@ -1,0 +1,15 @@
+{
+  "namespace": "application",
+  "properties": {
+    "id": {
+      "type": "integer",
+      "index": true
+    },
+    "name": {
+      "type": "string"
+    },
+    "apiKeys": {
+      "type": "array"
+    }
+  }
+}
