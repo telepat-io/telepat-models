@@ -1,5 +1,5 @@
 {
-  "namespace": "events",
+  "namespace": "comments",
   "properties": {
 	"id": {
 	  "type": "integer",
@@ -14,21 +14,14 @@
 	"text": {
 	  "type": "string"
 	},
-	"image": {
-	  "type": "string"
-	},
-	"options": {
-	  "type": "object"
-	},
-	"answers_count": {
-	  "type": "object"
-	},
 	"type": {
 	  "type": "integer"
 	}
   },
- "has_many": [
-   "comments",
-   "answers"
- ]
+  "filters": [
+	"events"
+  ],
+  "belongsTo": [
+	"events"
+  ]
 }

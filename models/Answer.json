@@ -1,5 +1,5 @@
 {
-  "namespace": "events",
+  "namespace": "answers",
   "properties": {
 	"id": {
 	  "type": "integer",
@@ -11,24 +11,14 @@
 	"modified": {
 	  "type": "integer"
 	},
-	"text": {
+	"key": {
 	  "type": "string"
-	},
-	"image": {
-	  "type": "string"
-	},
-	"options": {
-	  "type": "object"
-	},
-	"answers_count": {
-	  "type": "object"
 	},
 	"type": {
 	  "type": "integer"
 	}
   },
- "has_many": [
-   "comments",
-   "answers"
- ]
+  "belongsTo": [
+	"events"
+  ]
 }

@@ -1,0 +1,24 @@
+{
+  "namespace": "context",
+  "properties": {
+	"id": {
+	  "type": "integer",
+	  "index": true
+	},
+	"startTime": {
+	  "type": "integer"
+	},
+	"endTime": {
+	  "type": "integer"
+	},
+	"state": {
+	  "type": "integer"
+	},
+	"meta": {
+	  "type": "string"
+	},
+	"type": {
+	  "type": "string"
+	}
+  }
+}

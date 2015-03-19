@@ -8,8 +8,11 @@
     "name": {
       "type": "string"
     },
-    "apiKeys": {
+    "keys": {
       "type": "array"
-    }
+    },
+	"type": {
+	  "type": "string"
+	}
   }
 }
