@@ -1,5 +1,6 @@
 {
   "namespace": "answers",
+  "type": 5,
   "properties": {
 	"id": {
 	  "type": "integer",
@@ -11,14 +12,13 @@
 	"modified": {
 	  "type": "integer"
 	},
-	"key": {
-	  "type": "string"
-	},
 	"type": {
 	  "type": "integer"
 	}
   },
-  "belongsTo": [
-	"events"
+  "belongsTo": [{
+	"parentModel": "events",
+	"relationType": "has_some"
+  }
   ]
 }

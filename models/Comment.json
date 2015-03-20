@@ -1,5 +1,6 @@
 {
   "namespace": "comments",
+  "type": 4,
   "properties": {
 	"id": {
 	  "type": "integer",
@@ -18,10 +19,10 @@
 	  "type": "integer"
 	}
   },
-  "filters": [
-	"events"
-  ],
   "belongsTo": [
-	"events"
+	{
+	  "parentModel": "events",
+	  "relationType": "has_many"
+	}
   ]
 }

@@ -15,4 +15,6 @@ module.exports.getModels = function() {
 			models[name] = require('./models/'+files[f]);
 		}
 	}
+
+	return models;
 };
