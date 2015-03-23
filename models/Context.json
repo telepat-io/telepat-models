@@ -1,6 +1,6 @@
 {
   "namespace": "context",
-  "type": 0,
+  "type": "context",
   "properties": {
 	"id": {
 	  "type": "integer",

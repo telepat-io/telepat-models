@@ -1,6 +1,6 @@
 {
   "namespace": "events",
-  "type": 3,
+  "type": "event",
   "properties": {
 	"id": {
 	  "type": "integer",

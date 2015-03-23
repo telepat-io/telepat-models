@@ -1,6 +1,6 @@
 {
   "namespace": "answers",
-  "type": 5,
+  "type": "answer",
   "properties": {
 	"id": {
 	  "type": "integer",
@@ -14,6 +14,12 @@
 	},
 	"type": {
 	  "type": "integer"
+	},
+	"user_id": {
+	  "type": "integer"
+	},
+	"event_id": {
+	  "type" : "integer"
 	}
   },
   "belongsTo": [{

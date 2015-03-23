@@ -1,6 +1,6 @@
 {
-  "namespace": "comments",
-  "type": "comment",
+  "namespace": "games",
+  "type": "game",
   "properties": {
 	"id": {
 	  "type": "integer",
@@ -21,14 +21,14 @@
 	"user_id": {
 	  "type": "integer"
 	},
-	"event_id": {
-	  "type" : "integer"
+	"targeted_user_id": {
+	  "type": "integer"
+	},
+	"questions": {
+	  "type": "array"
+	},
+	"answers": {
+	  "type": "array"
 	}
-  },
-  "belongsTo": [
-	{
-	  "parentModel": "events",
-	  "relationType": "has_many"
-	}
-  ]
+  }
 }
