@@ -26,10 +26,13 @@
 	},
 	"type": {
 	  "type": "integer"
+	},
+	"context_id": {
+	  "type": "integer"
 	}
   },
  "has_many": [
-   "comments",
-   "answers"
+   "comment",
+   "answer"
  ]
 }

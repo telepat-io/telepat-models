@@ -23,7 +23,7 @@
 	}
   },
   "belongsTo": [{
-	"parentModel": "events",
+	"parentModel": "event",
 	"relationType": "has_some"
   }
   ]
