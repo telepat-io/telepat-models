@@ -7,7 +7,7 @@
       "index": true
     },
     "admin_id": {
-      "type": "integer"
+      "type": "string"
     },
     "icon": {
       "type": "string"
