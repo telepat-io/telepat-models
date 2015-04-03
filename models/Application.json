@@ -6,14 +6,20 @@
       "type": "integer",
       "index": true
     },
+    "admin_id": {
+      "type": "integer"
+    },
+    "icon": {
+      "type": "string"
+    },
     "name": {
       "type": "string"
     },
     "keys": {
       "type": "array"
     },
-	"type": {
-	  "type": "string"
-	}
+  	"type": {
+  	  "type": "string"
+  	}
   }
 }
