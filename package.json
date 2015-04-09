@@ -16,7 +16,10 @@
     "api",
     "models"
   ],
-  "author": "Razvan Botea <razvan@appscend.com>",
+  "author": {
+    "name": "Razvan Botea",
+    "email": "razvan@appscend.com"
+  },
   "license": "GPLv3",
   "private": true,
   "dependencies": {
