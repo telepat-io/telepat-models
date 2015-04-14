@@ -12,6 +12,9 @@
 	"modified": {
 	  "type": "integer"
 	},
+	"event_key": {
+	  "type": "integer"
+	},
 	"type": {
 	  "type": "integer"
 	},
@@ -20,6 +23,9 @@
 	},
 	"event_id": {
 	  "type" : "integer"
+	},
+	"application_id": {
+	  "type": "integer"
 	}
   },
   "belongsTo": [{

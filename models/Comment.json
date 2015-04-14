@@ -26,6 +26,9 @@
 	},
 	"context_id": {
 	  "type": "integer"
+	},
+	"application_id": {
+	  "type": "integer"
 	}
   },
   "belongsTo": [

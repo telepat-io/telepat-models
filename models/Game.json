@@ -29,6 +29,9 @@
 	},
 	"answers": {
 	  "type": "array"
+	},
+	"application_id": {
+	  "type": "integer"
 	}
   }
 }

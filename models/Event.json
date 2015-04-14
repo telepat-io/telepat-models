@@ -21,18 +21,20 @@
 	"options": {
 	  "type": "object"
 	},
-	"answers_count": {
-	  "type": "object"
-	},
 	"type": {
 	  "type": "integer"
 	},
 	"context_id": {
 	  "type": "integer"
+	},
+	"application_id": {
+	  "type": "integer"
 	}
   },
  "has_many": [
-   "comment",
-   "answer"
- ]
+   "comment"
+ ],
+  "has_some": [
+	"answer"
+  ]
 }
