@@ -20,6 +20,9 @@
 	},
 	"type": {
 	  "type": "string"
+	},
+	"application_id": {
+	  "type": "integer"
 	}
   }
 }
