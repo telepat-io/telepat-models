@@ -6,6 +6,9 @@
 	  "type": "integer",
 	  "index": true
 	},
+	"name": {
+	  "type": "string"
+	},
 	"startTime": {
 	  "type": "integer"
 	},
