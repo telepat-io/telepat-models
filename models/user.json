@@ -14,7 +14,10 @@
 	"profile_pic": {
 	  "type": "string"
 	},
-	"fbid": {
+	"gender": {
+	  "type": "string"
+	},
+	"fid": {
 	  "type": "string"
 	},
 	"devices": {
@@ -27,6 +30,9 @@
 	  "type": "array"
 	},
 	"authenticated": {
+	  "type": "integer"
+	},
+	"application_id": {
 	  "type": "integer"
 	}
   }

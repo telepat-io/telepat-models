@@ -10,3 +10,6 @@ module.exports.Subscription = require('./lib/Subscription');
 
 module.exports.Admin = require('./lib/Admin');
 module.exports.Admin.load();
+
+module.exports.User = require('./lib/User');
+module.exports.User.load();
