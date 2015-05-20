@@ -13,3 +13,5 @@ module.exports.Admin.load();
 
 module.exports.User = require('./lib/User');
 module.exports.User.load();
+
+module.exports.utils = require('./utils/utils');
