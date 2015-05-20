@@ -1,3 +1,41 @@
+/**
+ * Transform the object that is sent in the request body in the subscribe endpoint so its compatible with
+ * the elasticsearch query object.
+ * @param filterObject Object
+ * @example
+ * <pre>{
+  "or": [
+	{
+	  "and": [
+		{
+		  "is": {
+			"gender": "male",
+			"age": 23
+		  }
+		},
+		{
+		  "range": {
+			"experience": {
+			  "gte": 1,
+			  "lte": 6
+			}
+		  }
+		}
+	  ]
+	},
+	{
+	  "and": [
+		{
+		  "like": {
+			"image_url": "png",
+			"website": "png"
+		  }
+		}
+	  ]
+	}
+  ]
+}</pre>
+ */
 var parseQueryObject = function(filterObject) {
 	var objectKey = Object.keys(filterObject)[0];
 	var result = {};
@@ -45,6 +83,47 @@ var parseQueryObject = function(filterObject) {
 	return result;
 };
 
+/**
+ * Parses the query filter object to form the key of the filter of the subscription document inserted in the state
+ * bucket.
+ * @param filterObject Object
+ * @example
+ * <pre>{
+  "or": [
+	{
+	  "and": [
+		{
+		  "is": {
+			"gender": "male",
+			"age": 23
+		  }
+		},
+		{
+		  "range": {
+			"experience": {
+			  "gte": 1,
+			  "lte": 6
+			}
+		  }
+		}
+	  ]
+	},
+	{
+	  "and": [
+		{
+		  "like": {
+			"image_url": "png",
+			"website": "png"
+		  }
+		}
+	  ]
+	}
+  ]
+}</pre>
+ @example output
+ <pre>((gender=male&&age=23)&&(experience<=6&&experience>=1))||((image_url~png&&website~png))</pre>
+
+ */
 var getQueryKey = function(filterObject) {
 	var objectKey = Object.keys(filterObject)[0];
 	var result = '';
