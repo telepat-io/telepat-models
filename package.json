@@ -1,6 +1,6 @@
 {
   "name": "octopus-models-api",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Database models used in Beluga project",
   "main": "index.js",
   "scripts": {
