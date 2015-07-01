@@ -1,29 +1,40 @@
 {
-  "name": "octopus-models-api",
-  "version": "0.1.0",
-  "description": "Database models used in Beluga project",
+  "name": "telepat-models",
+  "version": "0.1.1",
+  "description": "Database models used by the Telepat API and Workers",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "repository": {
     "type": "git",
-    "url": "ssh://git@freshweb.ro:7999/bel/octopus-models-lib.git"
+    "url": "git@github.com:telepat-io/telepat-models.git"
   },
   "keywords": [
-    "octopus",
-    "beluga",
+    "telepat",
     "api",
     "models"
   ],
+  "bugs": {
+	"url": "https://github.com/telepat-io/telepat-models/issues"
+  },
   "author": {
     "name": "Razvan Botea",
-    "email": "razvan@appscend.com"
+    "email": "razvan@telepat.io"
+  },
+  "maintainers": [
+	{
+	  "name": "Răzvan Botea",
+	  "email": "razvan@telepat.io"
+	},
+	{
+	  "name": "Gabi Dobocan",
+	  "email": "gabi@telepat.io"
+	}
+  ],
+  "directories": {
+	"lib": "lib/"
   },
   "license": "Apache-2.0",
-  "private": true,
   "dependencies": {
-    "async": "^0.9.0",
-    "couchbase": "^2.0.6"
+    "async": "^1.2.0",
+    "couchbase": "^2.0.8"
   }
 }
