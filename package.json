@@ -16,10 +16,10 @@
 	"url": "https://github.com/telepat-io/telepat-models/issues"
   },
   "author": {
-    "name": "Razvan Botea",
+    "name": "Răzvan Botea",
     "email": "razvan@telepat.io"
   },
-  "maintainers": [
+  "contributors": [
 	{
 	  "name": "Răzvan Botea",
 	  "email": "razvan@telepat.io"
