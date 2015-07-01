@@ -20,7 +20,7 @@
     "name": "Razvan Botea",
     "email": "razvan@appscend.com"
   },
-  "license": "GPLv3",
+  "license": "Apache-2.0",
   "private": true,
   "dependencies": {
     "async": "^0.9.0",
