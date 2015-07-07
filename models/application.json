@@ -1,5 +1,5 @@
 {
-  "namespace": "application",
+  "namespace": "applications",
   "type": "application",
   "properties": {
     "id": {

@@ -1,5 +1,5 @@
 {
-  "namespace": "context",
+  "namespace": "contexts",
   "type": "context",
   "properties": {
 	"id": {

@@ -15,3 +15,6 @@ module.exports.User = require('./lib/User');
 module.exports.User.load();
 
 module.exports.utils = require('./utils/utils');
+
+module.exports.Channel = require('./lib/Channel');
+module.exports.Delta = require('./lib/Delta');
