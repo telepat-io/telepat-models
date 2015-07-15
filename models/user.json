@@ -37,6 +37,9 @@
 	},
 	"application_id": {
 	  "type": "integer"
+	},
+	"password": {
+	  "type": "string"
 	}
   }
 }
