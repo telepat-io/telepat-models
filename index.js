@@ -18,3 +18,5 @@ module.exports.utils = require('./utils/utils');
 
 module.exports.Channel = require('./lib/Channel');
 module.exports.Delta = require('./lib/Delta');
+
+module.exports.ProfilingContext = require('./utils/profiling');
