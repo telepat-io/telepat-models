@@ -1,6 +1,6 @@
 {
   "name": "telepat-models",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Database models used by the Telepat API and Workers",
   "main": "index.js",
   "repository": {
