@@ -36,6 +36,8 @@
   "dependencies": {
     "async": "1.2.0",
     "clone": "1.0.2",
-    "couchbase": "2.0.8"
+    "couchbase": "2.0.8",
+    "elasticsearch": "5.0.0",
+    "uuid": "^2.0.1"
   }
 }
