@@ -326,7 +326,7 @@ function testObject(object, query) {
 
 
 //console.log(JSON.stringify(getQueryKey(JSON.parse('{"or":[{"and":[{"is":{"gender":"male","age":23}},{"range":{"experience":{"gte":1,"lte":6}}}]},{"and":[{"like":{"image_url":"png","website":"png"}}]}]}'))));
-//console.log(testObject({gender: 'male', age: 23, message: 'text xx xxxx', "experience": 15}, {"and":[{"is":{"gender":"male","age":23}},{"like":{"message":"xx"}},{"range":{"experience":{"lte":6,"gte":1}}}]}));
+//console.log(parseQueryObject(JSON.parse('{"or":[{"and":[{"is":{"gender":"male","age":23}},{"range":{"experience":{"gte":1,"lte":6}}}]},{"and":[{"like":{"image_url":"png","website":"png"}}]}]}')));
 
 module.exports = {
 	parseQueryObject: parseQueryObject,

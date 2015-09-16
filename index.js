@@ -20,3 +20,6 @@ module.exports.Channel = require('./lib/Channel');
 module.exports.Delta = require('./lib/Delta');
 
 module.exports.ProfilingContext = require('./utils/profiling');
+
+module.exports.Datasource = require('./lib/datasource');
+module.exports.ElasticSearch = require('./lib/elasticsearch_adapter');
