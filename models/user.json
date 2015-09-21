@@ -1,6 +1,4 @@
 {
-  "namespace": "users",
-  "type": "user",
   "properties": {
 	"id": {
 	  "type": "integer"

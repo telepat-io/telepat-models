@@ -1,6 +1,4 @@
 {
-  "namespace": "applications",
-  "type": "application",
   "properties": {
     "id": {
       "type": "integer",

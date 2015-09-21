@@ -1,6 +1,4 @@
 {
-  "namespace": "admin",
-  "type": "admin",
   "properties": {
 	"email": {
 	  "type": "string"

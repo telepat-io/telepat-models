@@ -1,6 +1,4 @@
 {
-  "namespace": "contexts",
-  "type": "context",
   "properties": {
 	"id": {
 	  "type": "integer",
