@@ -1,3 +1,17 @@
+# 0.2.3
+
+* Replaced couchbase with elasticsearch through adapters
+* Fixed many bugs
+* Added email field to Deltas (used by user operations)
+* Admin create throws 409 error when admin with that email address already exists
+* Implemented admin.delete
+* getDevices returns the corect error message when missing
+* Implemented Delta.processObject which can be used by all update operations
+
+# 0.2.2
+
+* Release full of bug fixes
+
 # 0.2.1
 
 * Important performance issue fixed: all Models operations require context id when getting the object from database
