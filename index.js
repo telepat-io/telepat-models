@@ -23,3 +23,5 @@ module.exports.ProfilingContext = require('./utils/profiling');
 
 module.exports.Datasource = require('./lib/datasource');
 module.exports.ElasticSearch = require('./lib/elasticsearch_adapter');
+
+module.exports.TelepatError = require('./lib/TelepatError');
