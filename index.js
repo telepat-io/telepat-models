@@ -21,7 +21,9 @@ module.exports.Delta = require('./lib/Delta');
 
 module.exports.ProfilingContext = require('./utils/profiling');
 
-module.exports.Datasource = require('./lib/datasource');
-module.exports.ElasticSearch = require('./lib/elasticsearch_adapter');
-
 module.exports.TelepatError = require('./lib/TelepatError');
+
+module.exports.Datasource = require('./lib/database/datasource');
+module.exports.ElasticSearch = require('./lib/database/elasticsearch_adapter');
+
+module.exports.Kafka = require('./lib/message_queue/kafka_client');
