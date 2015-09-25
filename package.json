@@ -37,6 +37,7 @@
     "async": "1.2.0",
     "clone": "1.0.2",
     "elasticsearch": "5.0.0",
+	"kafka-node": "^0.2.28",
     "sprintf-js": "^1.0.3",
     "uuid": "^2.0.1"
   }
