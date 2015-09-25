@@ -1,3 +1,10 @@
+# 0.2.4
+
+* Standardized Errors with TelepatError object
+* Implemented Delta.formPatches to more easily form patches from objects
+* Moved messaging client from telepat-worker to telepat-models to be reusable by other components
+* Added 'type' field to application, context and admin objects
+
 # 0.2.3
 
 * Replaced couchbase with elasticsearch through adapters
