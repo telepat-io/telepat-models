@@ -28,7 +28,7 @@ module.exports.TelepatError = require('./lib/TelepatError');
 module.exports.Datasource = require('./lib/database/datasource');
 module.exports.ElasticSearch = require('./lib/database/elasticsearch_adapter');
 
-fs.readdirSync('./node_modules/telepat-models/lib/message_queue').forEach(function(filename) {
+fs.readdirSync(__dirname+'/lib/message_queue').forEach(function(filename) {
 	var filenameParts = filename.split('_');
 
 	if (filenameParts.pop() == 'queue.js') {
