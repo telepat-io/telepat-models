@@ -4,41 +4,42 @@
   "description": "Database models used by the Telepat API and Workers",
   "main": "index.js",
   "repository": {
-    "type": "git",
-    "url": "git@github.com:telepat-io/telepat-models.git"
+	"type": "git",
+	"url": "git@github.com:telepat-io/telepat-models.git"
   },
   "keywords": [
-    "telepat",
-    "api",
-    "models"
+	"telepat",
+	"api",
+	"models"
   ],
   "bugs": {
-    "url": "https://github.com/telepat-io/telepat-models/issues"
+	"url": "https://github.com/telepat-io/telepat-models/issues"
   },
   "author": {
-    "name": "Răzvan Botea",
-    "email": "razvan@telepat.io"
+	"name": "Răzvan Botea",
+	"email": "razvan@telepat.io"
   },
   "contributors": [
-    {
-      "name": "Răzvan Botea",
-      "email": "razvan@telepat.io"
-    },
-    {
-      "name": "Gabi Dobocan",
-      "email": "gabi@telepat.io"
-    }
+	{
+	  "name": "Răzvan Botea",
+	  "email": "razvan@telepat.io"
+	},
+	{
+	  "name": "Gabi Dobocan",
+	  "email": "gabi@telepat.io"
+	}
   ],
   "directories": {
-    "lib": "lib/"
+	"lib": "lib/"
   },
   "license": "Apache-2.0",
   "dependencies": {
-    "async": "1.2.0",
-    "clone": "1.0.2",
-    "elasticsearch": "5.0.0",
+	"async": "1.2.0",
+	"azure": "^0.10.6",
+	"clone": "1.0.2",
+	"elasticsearch": "5.0.0",
 	"kafka-node": "^0.2.28",
-    "sprintf-js": "^1.0.3",
-    "uuid": "^2.0.1"
+	"sprintf-js": "^1.0.3",
+	"uuid": "^2.0.1"
   }
 }
