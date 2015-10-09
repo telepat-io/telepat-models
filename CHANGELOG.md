@@ -1,3 +1,13 @@
+# 0.2.5
+
+* Fixed various bugs
+* 2 New message queue clients: **Azure ServiceBus** and **AMQP (RabbitMQ)**
+* ElasticSearch should refresh its index on create/delete
+* Configuration variables for ElasticSearch adapter get/subscribe result limit + paginated results for subscribe
+* Model.countByChannel fixed
+* Rewored how loadedAppModels work: every package should populate this at boot up. App.get loads from redis (cached)
+* All message queue clients now have a broadcast method which broadcasts messages to all consumers on a channel/topic
+
 # 0.2.4
 
 * Standardized Errors with TelepatError object
