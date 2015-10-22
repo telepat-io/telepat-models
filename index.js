@@ -35,3 +35,11 @@ fs.readdirSync(__dirname+'/lib/message_queue').forEach(function(filename) {
 		module.exports[filenameParts.join('_')] = require('./lib/message_queue/'+filename);
 	}
 });
+
+fs.readdirSync(__dirname+'/lib/logger').forEach(function(filename) {
+	var filenameParts = filename.split('_');
+
+	if (filenameParts.pop() == 'logger.js') {
+		module.exports[filenameParts.join('_')+'_logger'] = require('./lib/logger/'+filename);
+	}
+});
