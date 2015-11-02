@@ -64,7 +64,7 @@ var parseQueryObject = function(filterObject) {
 				otherFilters[filterObjectKey] = {};
 
 				for(var prop in filterObject[objectKey][f][filterObjectKey]) {
-					otherFilters[filterObjectKey]['doc.'+prop] = filterObject[objectKey][f][filterObjectKey][prop];
+					otherFilters[filterObjectKey][prop] = filterObject[objectKey][f][filterObjectKey][prop];
 				}
 
 				result[objectKey].push(otherFilters);
@@ -75,7 +75,7 @@ var parseQueryObject = function(filterObject) {
 		for(var prop in filterObject[objectKey][f][filterObjectKey]) {
 			var p = {};
 			p[filterType] = {};
-			p[filterType]['doc.'+prop] = filterObject[objectKey][f][filterObjectKey][prop];
+			p[filterType][prop] = filterObject[objectKey][f][filterObjectKey][prop];
 			result[objectKey].push(p);
 		}
 	}
