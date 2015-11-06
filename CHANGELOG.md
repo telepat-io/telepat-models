@@ -1,3 +1,25 @@
+# 0.2.7
+
+* Fixed some bugs and crashes
+* Redis keys are being scanned untill cursor returns 0
+* Changed **email** property of user to **username**
+* Added `ExpiredAuthorizationToken` error
+
+# 0.2.6
+
+* User.get can now be called with an object containing ID or email
+* Fixed bug in AMQP message client which created unintended queues
+* `applicationDeleteModelSchema` now deletes all model siblings
+* Implemented `removeAllSubscriptionsFromDevice`
+* Fixed handling of errors on Application.loadAllApllications
+* Correct stack trace generation on TelepatError
+* Subscription and Device keys now contain the applicationID in them
+* Implemented `removeDevice`
+* Implemented `TelepatLogger` used for logging purposes
+	* `syslogger`
+	* `console_logger`
+* Fixed kafka/AzureSB crash
+
 # 0.2.5
 
 * Fixed various bugs
