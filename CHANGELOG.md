@@ -1,3 +1,14 @@
+# 0.2.8
+
+* Bugfix: Channel.isValid when mask is invalid
+* Bugfix: Channel when used with parent objects
+* Bugfix: `applicationHasContext` in elasticSearch adapter returns false instead of an error in callback
+* Bugfix: `modelCountByChannel` in elasticSearch adapter, context is optional
+* Bugfix: `modelCountByChannel` should now work with filters
+* `LoginProviderNotConfigured` error transformed into a more generic error `ServerNotConfigured`
+* Added support for aggregating results in `modelCountByChannel`
+* Added supoprt for object sort in `modelSearch`
+
 # 0.2.7
 
 * Fixed some bugs and crashes
