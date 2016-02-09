@@ -28,18 +28,12 @@ module.exports.TelepatError = require('./lib/TelepatError');
 module.exports.Datasource = require('./lib/database/datasource');
 module.exports.ElasticSearch = require('./lib/database/elasticsearch_adapter');
 
+module.exports.TelepatLogger = require('./lib/logger/logger');
+
 fs.readdirSync(__dirname+'/lib/message_queue').forEach(function(filename) {
 	var filenameParts = filename.split('_');
 
 	if (filenameParts.pop() == 'queue.js') {
 		module.exports[filenameParts.join('_')] = require('./lib/message_queue/'+filename);
-	}
-});
-
-fs.readdirSync(__dirname+'/lib/logger').forEach(function(filename) {
-	var filenameParts = filename.split('_');
-
-	if (filenameParts.pop() == 'logger.js') {
-		module.exports[filenameParts.join('_')+'_logger'] = require('./lib/logger/'+filename);
 	}
 });

@@ -42,9 +42,10 @@
 	"elasticsearch": "5.0.0",
 	"kafka-node": "^0.2.28",
 	"sprintf-js": "^1.0.3",
-	"uuid": "^2.0.1"
+	"uuid": "^2.0.1",
+	"winston": "2.1.1"
   },
   "optionalDependencies": {
-	"node-syslog": "1.2.0"
+	"winston-syslog": "1.2.1"
   }
 }
