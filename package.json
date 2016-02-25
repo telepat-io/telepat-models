@@ -34,6 +34,7 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
+	"agentkeepalive": "2.0.3",
 	"amqplib": "0.4.1",
 	"async": "1.5.2",
 	"azure": "0.10.6",
