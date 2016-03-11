@@ -1,3 +1,23 @@
+# 0.3.0
+
+* Performance fix: AMQP queues/exchanges are only asserted once
+* Devices are created in an inactive keyspace. They should be activated
+when a client connects to a volatile transport
+* Implemented methods to activate/deactivate devices
+* Performance fix: incresed maxSockets for ElasticSearch
+* Performance fix: used agentKeepAlive for elasticSearch SDK
+* Ability to connect to multiple ES nodes, or just one if you want to
+use auto-discovery
+* Messaging clients has the exclusive flag making them have one queue
+per client
+* Implemented offset/limit for some methods
+* Implemented userMetadata use only by their respectiv owners
+* Replaced syslog_logger with Winston
+* Fixed a bug where updating objects with a field of type object would
+make the operation to merge the fields instead of replacing the whole
+object
+* Implemented caching for count queries
+
 # 0.2.8
 
 * Bugfix: Channel.isValid when mask is invalid

@@ -6,8 +6,8 @@ This package contains the libraries for using various telepat resources:
 
 * Databases:
 	* At the moment only elasticSearch support is implemented (version 1.7.x). Configuration variables:
-		* `TP_ES_HOST`: Elasticsearch server
-        * `TP_ES_PORT`: Elasticsearch server port
+		* `TP_ES_HOST`: Elasticsearch server:port. This option will use autodiscovery.
+		* `TP_ES_HOSTS`: server1:port,server2:port. This option will not use autodiscovery.
         * `TP_ES_INDEX`: Elasticsearch index
         * `TP_ES_SUBSCRIBE_LIMIT` (optional): How many results the modelSearch method (used in subscriptions) should return (paginated). Default 64.
         * `TP_ES_GET_LIMIT` (optional): How many resutls every other search methods should return (not paginated, fixed). Default 384.
@@ -28,6 +28,6 @@ This package contains the libraries for using various telepat resources:
 		* `TP_AMQP_PASSWORD`: The password for the user
 
 * Loggers:
-	* Simple console logger (default)
-	* Syslogger (defaults to simple console logger if OS doesn't support it)
-		* The configuration is an array of flags/options defined by [Linux Syslog](http://man7.org/linux/man-pages/man3/syslog.3.html)
+	* We use winston logger: [Winston](https://github.com/winstonjs/winston)
+	* `TP_LOGGER`: the name of the Winston logger (eg.: Console)
+	* `TP_LOG_LEVEL`: logging level
