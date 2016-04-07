@@ -203,6 +203,9 @@ function testObject(object, query) {
 	var mainOperator = Object.keys(query)[0];
 	var result = null;
 
+	if (mainOperator !== 'and' && mainOperator !== 'or')
+		return false;
+
 	for(var operand in query[mainOperator]) {
 		var operator2 = Object.keys(query[mainOperator][operand])[0];
 
