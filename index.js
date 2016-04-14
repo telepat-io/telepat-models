@@ -30,6 +30,8 @@ module.exports.ElasticSearch = require('./lib/database/elasticsearch_adapter');
 
 module.exports.TelepatLogger = require('./lib/logger/logger');
 
+module.exports.TelepatIndexedList = require('./lib/TelepatIndexedLists');
+
 fs.readdirSync(__dirname+'/lib/message_queue').forEach(function(filename) {
 	var filenameParts = filename.split('_');
 
