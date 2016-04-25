@@ -1,5 +1,6 @@
 var lz4Module = require('lz4');
 var stream = require('stream');
+var async = require('async');
 
 /**
  * Transform the object that is sent in the request body in the subscribe endpoint so its compatible with
@@ -95,6 +96,9 @@ var parseQueryObject = function(filterObject) {
 function testObject(object, query) {
 	var mainOperator = Object.keys(query)[0];
 	var result = null;
+
+	if (mainOperator !== 'and' && mainOperator !== 'or')
+		return false;
 
 	for(var operand in query[mainOperator]) {
 		var operator2 = Object.keys(query[mainOperator][operand])[0];
@@ -275,11 +279,38 @@ var lz4 = (function() {
 	};
 })();
 
+var scanRedisKeysPattern = function(pattern, redisInstance, callback) {
+	var redisScanCursor = -1;
+	var results = [];
+
+	var scanAndGet = function(callback1) {
+		redisInstance.scan([redisScanCursor == -1 ? 0 : redisScanCursor,
+			'MATCH', pattern, 'COUNT', 100000], function(err, partialResults) {
+			if (err) return callback1(err);
+
+			redisScanCursor = partialResults[0];
+			results = results.concat(partialResults[1]);
+
+			callback1();
+		});
+	};
+
+	async.during(
+		function(callback1) {
+			callback1(null, redisScanCursor != 0);
+		},
+		scanAndGet,
+		function(err) {
+			callback(err, results);
+		}
+	);
+};
 //console.log(JSON.stringify(getQueryKey(JSON.parse('{"or":[{"and":[{"is":{"gender":"male","age":23}},{"range":{"experience":{"gte":1,"lte":6}}}]},{"and":[{"like":{"image_url":"png","website":"png"}}]}]}'))));
 //console.log(parseQueryObject(JSON.parse('{"or":[{"and":[{"is":{"gender":"male","age":23}},{"range":{"experience":{"gte":1,"lte":6}}}]},{"and":[{"like":{"image_url":"png","website":"png"}}]}]}')));
 
 module.exports = {
 	parseQueryObject: parseQueryObject,
 	testObject: testObject,
-	lz4: lz4
+	lz4: lz4,
+	scanRedisKeysPattern: scanRedisKeysPattern
 };
