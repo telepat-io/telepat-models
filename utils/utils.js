@@ -1,3 +1,6 @@
+var lz4Module = require('lz4');
+var stream = require('stream');
+
 /**
  * Transform the object that is sent in the request body in the subscribe endpoint so its compatible with
  * the elasticsearch query object.
@@ -81,116 +84,6 @@ var parseQueryObject = function(filterObject) {
 	}
 
 	return result;
-};
-
-/**
- * Parses the query filter object to form the key of the filter of the subscription document inserted in the state
- * bucket.
- * @param filterObject Object
- * @example
- * <pre>{
-  "or": [
-	{
-	  "and": [
-		{
-		  "is": {
-			"gender": "male",
-			"age": 23
-		  }
-		},
-		{
-		  "range": {
-			"experience": {
-			  "gte": 1,
-			  "lte": 6
-			}
-		  }
-		}
-	  ]
-	},
-	{
-	  "and": [
-		{
-		  "like": {
-			"image_url": "png",
-			"website": "png"
-		  }
-		}
-	  ]
-	}
-  ]
-}</pre>
- @example output
- <pre>((gender=male&&age=23)&&(experience<=6&&experience>=1))||((image_url~png&&website~png))</pre>
-
- */
-var getQueryKey = function(filterObject) {
-	var objectKey = Object.keys(filterObject)[0];
-	var result = '';
-	var mainOperator = '';
-
-	switch(objectKey) {
-		case 'and': {
-			mainOperator = '&&';
-			break;
-		}
-		case 'or': {
-			mainOperator = '||';
-			break;
-		}
-	}
-
-	for(var f in filterObject[objectKey]) {
-		var filterObjectKey = Object.keys(filterObject[objectKey][f])[0];
-
-		if (filterObjectKey == 'and' || filterObjectKey == 'or') {
-			result += '('+getQueryKey(filterObject[objectKey][f])+')'+mainOperator;
-			continue;
-		}
-
-		var operator = '';
-
-		switch(filterObjectKey) {
-			case 'is': {
-				operator = '=';
-
-				break;
-			}
-			case 'like': {
-				operator = '~';
-
-				break;
-			}
-			default: {
-
-			}
-		}
-
-		result += '(';
-		for(var t in filterObject[objectKey][f][filterObjectKey]) {
-			if (filterObjectKey == 'range') {
-				if (filterObject[objectKey][f][filterObjectKey][t]['lte'] !== undefined) {
-					result += t+'<='+filterObject[objectKey][f][filterObjectKey][t]['lte']+'&&';
-				} else if (filterObject[objectKey][f][filterObjectKey][t]['lt'] !== undefined) {
-					result += t+'<'+filterObject[objectKey][f][filterObjectKey][t]['te']+'&&';
-				}
-
-				if (filterObject[objectKey][f][filterObjectKey][t]['gte'] !== undefined) {
-					result += t+'>='+filterObject[objectKey][f][filterObjectKey][t]['gte']+'&&';
-				} else if (filterObject[objectKey][f][filterObjectKey][t]['gt'] !== undefined) {
-					result += t + '>' + filterObject[objectKey][f][filterObjectKey][t]['gt']+'&&';
-				}
-
-			} else {
-				result += t+operator+filterObject[objectKey][f][filterObjectKey][t]+mainOperator;
-			}
-		}
-
-		result = result.slice(0, -mainOperator.length);
-		result += ')'+mainOperator;
-	}
-
-	return result.slice(0, -mainOperator.length);
 };
 
 /**
@@ -323,13 +216,70 @@ function testObject(object, query) {
 	return Boolean(result);
 }
 
+var lz4 = (function() {
 
+	/**
+	 * @callback lz4ResultCb
+	 * @param {Buffer} result The result of compression/decompression
+	 */
+	/**
+	 * Only used internally to avoid code dupe
+	 * @param {string|Buffer} data
+	 * @param {int} operation 0 for compression, 1 for decompression
+	 * @param {lz4ResultCb} callback
+	 */
+	var doWork = function(data, operation, callback) {
+		var lz4Stream = null;
+
+		if (operation == 0)
+			lz4Stream = lz4Module.createEncoderStream();
+		else if (operation == 1)
+			lz4Stream = lz4Module.createDecoderStream();
+
+		var outputStream = new stream.Writable();
+		var result = new Buffer('');
+
+		outputStream._write = function(chunk, encoding, callback1) {
+			result = Buffer.concat([result, chunk]);
+			callback1();
+		};
+
+		outputStream.on('finish', function() {
+			callback(result);
+		});
+
+		var inputStream = new stream.Readable();
+		inputStream.push(data);
+		inputStream.push(null);
+
+		inputStream.pipe(lz4Stream).pipe(outputStream);
+	}
+
+	return {
+		/**
+		 * LZ4 compress a string
+		 * @param {string} string
+		 * @param {lz4ResultCb} callback
+		 */
+		compress: function(string, callback) {
+			doWork(string, 0, callback);
+		},
+		/**
+		 * LZ4 decompress a string
+		 * @param {Buffer} buffer
+		 * @param {lz4ResultCb} callback
+		 */
+		decompress: function(buffer, callback) {
+			doWork(buffer, 1, callback);
+		}
+	};
+})();
 
 //console.log(JSON.stringify(getQueryKey(JSON.parse('{"or":[{"and":[{"is":{"gender":"male","age":23}},{"range":{"experience":{"gte":1,"lte":6}}}]},{"and":[{"like":{"image_url":"png","website":"png"}}]}]}'))));
 //console.log(parseQueryObject(JSON.parse('{"or":[{"and":[{"is":{"gender":"male","age":23}},{"range":{"experience":{"gte":1,"lte":6}}}]},{"and":[{"like":{"image_url":"png","website":"png"}}]}]}')));
 
 module.exports = {
 	parseQueryObject: parseQueryObject,
-	getQueryKey: getQueryKey,
-	testObject: testObject
+	testObject: testObject,
+	lz4: lz4
 };
