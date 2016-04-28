@@ -1,3 +1,17 @@
+# 0.4.0
+
+* Major performance improvements
+* AMQP messages are now compressed using LZ4
+* TelepatIndexedLists is a data structure on redis used to rapidly search
+for members
+* Simpliefied the database adapter, now they can be used in bulk operations
+* Device IDs are no longer stored in subscriptions, instead their tokens
+are stored in order to avoid retrieving the device object everytime
+* Filter builder is used by database adapters in order to form filters
+for querying the database
+* Moved some of the logic from the old adapter's functions to functions
+in Admin/Context/Model/etc
+
 # 0.3.0
 
 * Performance fix: AMQP queues/exchanges are only asserted once
