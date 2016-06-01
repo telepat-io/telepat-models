@@ -206,116 +206,122 @@ function testObject(object, query) {
 	for(var operand in query[mainOperator]) {
 		var operator2 = Object.keys(query[mainOperator][operand])[0];
 
-		switch(operator2) {
-			case 'is': {
-				for (var operand2 in query[mainOperator][operand][operator2]) {
-					var partialResult = query[mainOperator][operand][operator2][operand2] === object[operand2];
-					if (result === null) {
-						result = partialResult;
-					} else {
-						if (mainOperator == 'and') {
-							result &= partialResult;
-						} else if (mainOperator == 'or') {
-							result |= partialResult;
+		if (operator2 == 'or')
+			result |= testObject(object, query[mainOperator][operand]);
+		else if (operator2 == 'and')
+			result &= testObject(object, query[mainOperator][operand]);
+		else {
+			switch(operator2) {
+				case 'is': {
+					for (var operand2 in query[mainOperator][operand][operator2]) {
+						var partialResult = query[mainOperator][operand][operator2][operand2] === object[operand2];
+						if (result === null) {
+							result = partialResult;
+						} else {
+							if (mainOperator == 'and') {
+								result &= partialResult;
+							} else if (mainOperator == 'or') {
+								result |= partialResult;
+							}
 						}
 					}
+
+					break;
 				}
 
-				break;
-			}
-
-			case 'like': {
-				for (operand2 in query[mainOperator][operand][operator2]) {
-					partialResult =  object[operand2].toString().search(query[mainOperator][operand][operator2][operand2]) !== -1;
-					if (result === null) {
-						result = partialResult;
-					} else {
-						if (mainOperator == 'and') {
-							result &= partialResult;
-						} else if (mainOperator == 'or') {
-							result |= partialResult;
+				case 'like': {
+					for (operand2 in query[mainOperator][operand][operator2]) {
+						partialResult =  object[operand2].toString().search(query[mainOperator][operand][operator2][operand2]) !== -1;
+						if (result === null) {
+							result = partialResult;
+						} else {
+							if (mainOperator == 'and') {
+								result &= partialResult;
+							} else if (mainOperator == 'or') {
+								result |= partialResult;
+							}
 						}
 					}
+
+					break;
 				}
 
-				break;
-			}
+				case 'range': {
+					var prop = Object.keys(query[mainOperator][operand][operator2])[0];
 
-			case 'range': {
-				var prop = Object.keys(query[mainOperator][operand][operator2])[0];
+					for (operand2 in query[mainOperator][operand][operator2][prop]) {
+						partialResult =  null;
 
-				for (operand2 in query[mainOperator][operand][operator2][prop]) {
-					partialResult =  null;
-
-					if (object[prop] === undefined) {
-						if (mainOperator == 'and') {
-							result &= false;
-						} else if (mainOperator == 'or') {
-							result |= false;
-						}
-
-						continue;
-					}
-
-					switch(operand2) {
-						case 'lte': {
-							partialResult = query[mainOperator][operand][operator2][prop][operand2] >= object[prop];
-
-							break;
-						}
-						case 'gte': {
-							if (partialResult === null)
-								partialResult = query[mainOperator][operand][operator2][prop][operand2] <= object[prop];
-							else {
-								if (mainOperator == 'and') {
-									result &= partialResult;
-								} else if (mainOperator == 'or') {
-									result |= partialResult;
-								}
+						if (object[prop] === undefined) {
+							if (mainOperator == 'and') {
+								result &= false;
+							} else if (mainOperator == 'or') {
+								result |= false;
 							}
 
-							break;
+							continue;
 						}
-						case 'lt': {
-							if (partialResult === null)
-								partialResult = query[mainOperator][operand][operator2][prop][operand2] > object[prop];
-							else {
-								if (mainOperator == 'and') {
-									result &= partialResult;
-								} else if (mainOperator == 'or') {
-									result |= partialResult;
-								}
-							}
 
-							break;
+						switch(operand2) {
+							case 'lte': {
+								partialResult = query[mainOperator][operand][operator2][prop][operand2] >= object[prop];
+
+								break;
+							}
+							case 'gte': {
+								if (partialResult === null)
+									partialResult = query[mainOperator][operand][operator2][prop][operand2] <= object[prop];
+								else {
+									if (mainOperator == 'and') {
+										result &= partialResult;
+									} else if (mainOperator == 'or') {
+										result |= partialResult;
+									}
+								}
+
+								break;
+							}
+							case 'lt': {
+								if (partialResult === null)
+									partialResult = query[mainOperator][operand][operator2][prop][operand2] > object[prop];
+								else {
+									if (mainOperator == 'and') {
+										result &= partialResult;
+									} else if (mainOperator == 'or') {
+										result |= partialResult;
+									}
+								}
+
+								break;
+							}
+							case 'gt': {
+								if (partialResult === null)
+									partialResult = query[mainOperator][operand][operator2][prop][operand2] < object[prop];
+								else {
+									if (mainOperator == 'and') {
+										result &= partialResult;
+									} else if (mainOperator == 'or') {
+										result |= partialResult;
+									}
+								}
+
+								break;
+							}
 						}
-						case 'gt': {
-							if (partialResult === null)
-								partialResult = query[mainOperator][operand][operator2][prop][operand2] < object[prop];
-							else {
-								if (mainOperator == 'and') {
-									result &= partialResult;
-								} else if (mainOperator == 'or') {
-									result |= partialResult;
-								}
-							}
 
-							break;
+						if (result === null) {
+							result = partialResult;
+						} else {
+							if (mainOperator == 'and') {
+								result &= partialResult;
+							} else if (mainOperator == 'or') {
+								result |= partialResult;
+							}
 						}
 					}
 
-					if (result === null) {
-						result = partialResult;
-					} else {
-						if (mainOperator == 'and') {
-							result &= partialResult;
-						} else if (mainOperator == 'or') {
-							result |= partialResult;
-						}
-					}
+					break;
 				}
-
-				break;
 			}
 		}
 	}
