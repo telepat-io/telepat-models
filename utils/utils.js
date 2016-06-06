@@ -200,136 +200,113 @@ var getQueryKey = function(filterObject) {
  * @returns {boolean}
  */
 function testObject(object, query) {
+	if (typeof object != 'object')
+		return false;
+
+	if (typeof query != 'object')
+		return false;
+
 	var mainOperator = Object.keys(query)[0];
+
+	if (mainOperator != 'and' && mainOperator != 'or')
+		return false;
+
 	var result = null;
+	var partialResult = null
 
-	for(var operand in query[mainOperator]) {
-		var operator2 = Object.keys(query[mainOperator][operand])[0];
+	function updateResult(result, partial) {
+		//if result is not initialised, use the value of the operation
+		//otherwise if it had a value from previous operations, combine the previous result with result from
+		//	the current operation
+		return result === null ? partialResult :(mainOperator == 'and') ? result && partialResult :
+			result || partialResult;
+	}
 
-		if (operator2 == 'or')
-			result |= testObject(object, query[mainOperator][operand]);
-		else if (operator2 == 'and')
-			result &= testObject(object, query[mainOperator][operand]);
-		else {
-			switch(operator2) {
+	for(var i in query[mainOperator]) {
+		if (typeof query[mainOperator][i] != 'object')
+			continue;
+
+		var operation = Object.keys(query[mainOperator][i])[0];
+
+		operationsLoop:
+		for(var property in query[mainOperator][i][operation]) {
+			switch(operation) {
 				case 'is': {
-					for (var operand2 in query[mainOperator][operand][operator2]) {
-						var partialResult = query[mainOperator][operand][operator2][operand2] === object[operand2];
-						if (result === null) {
-							result = partialResult;
-						} else {
-							if (mainOperator == 'and') {
-								result &= partialResult;
-							} else if (mainOperator == 'or') {
-								result |= partialResult;
-							}
-						}
-					}
+					partialResult = object[property] == query[mainOperator][i][operation][property];
 
 					break;
 				}
 
 				case 'like': {
-					for (operand2 in query[mainOperator][operand][operator2]) {
-						partialResult =  object[operand2].toString().search(query[mainOperator][operand][operator2][operand2]) !== -1;
-						if (result === null) {
-							result = partialResult;
-						} else {
-							if (mainOperator == 'and') {
-								result &= partialResult;
-							} else if (mainOperator == 'or') {
-								result |= partialResult;
-							}
-						}
-					}
+					partialResult = object[property].toString().search(query[mainOperator][i][operation][property]) !== -1;
 
 					break;
 				}
 
 				case 'range': {
-					var prop = Object.keys(query[mainOperator][operand][operator2])[0];
+					if (typeof query[mainOperator][i][operation][operation][property] != 'object')
+						continue;
 
-					for (operand2 in query[mainOperator][operand][operator2][prop]) {
-						partialResult =  null;
+					rangeQueryLoop:
+					for(var rangeOperator in query[mainOperator][i][operation][property]) {
+						var objectPropValue = parseInt(object[property]);
+						var queryPropValue = parseInt(query[mainOperator][i][operation][property][rangeOperator]);
 
-						if (object[prop] === undefined) {
-							if (mainOperator == 'and') {
-								result &= false;
-							} else if (mainOperator == 'or') {
-								result |= false;
-							}
-
-							continue;
-						}
-
-						switch(operand2) {
-							case 'lte': {
-								partialResult = query[mainOperator][operand][operator2][prop][operand2] >= object[prop];
-
-								break;
-							}
+						switch(rangeOperator) {
 							case 'gte': {
-								if (partialResult === null)
-									partialResult = query[mainOperator][operand][operator2][prop][operand2] <= object[prop];
-								else {
-									if (mainOperator == 'and') {
-										result &= partialResult;
-									} else if (mainOperator == 'or') {
-										result |= partialResult;
-									}
-								}
+								partialResult = objectPropValue >= queryPropValue;
 
 								break;
 							}
-							case 'lt': {
-								if (partialResult === null)
-									partialResult = query[mainOperator][operand][operator2][prop][operand2] > object[prop];
-								else {
-									if (mainOperator == 'and') {
-										result &= partialResult;
-									} else if (mainOperator == 'or') {
-										result |= partialResult;
-									}
-								}
 
-								break;
-							}
 							case 'gt': {
-								if (partialResult === null)
-									partialResult = query[mainOperator][operand][operator2][prop][operand2] < object[prop];
-								else {
-									if (mainOperator == 'and') {
-										result &= partialResult;
-									} else if (mainOperator == 'or') {
-										result |= partialResult;
-									}
-								}
+								partialResult = objectPropValue > queryPropValue;
 
 								break;
 							}
-						}
 
-						if (result === null) {
-							result = partialResult;
-						} else {
-							if (mainOperator == 'and') {
-								result &= partialResult;
-							} else if (mainOperator == 'or') {
-								result |= partialResult;
+							case 'lte': {
+								partialResult = objectPropValue <= queryPropValue;
+
+								break;
+							}
+
+							case 'lt': {
+								partialResult = objectPropValue < queryPropValue;
+
+								break;
+							}
+
+							default: {
+								continue rangeQueryLoop;
 							}
 						}
+
+						result = updateResult(result, partialResult);
 					}
 
 					break;
 				}
+
+				case 'or':
+				case 'and': {
+					//console.log(query[mainOperator][i]);
+					partialResult = testObject(object, query[mainOperator][i]);
+
+					break;
+				}
+
+				default: {
+					continue operationsLoop;
+				}
 			}
+
+			result = updateResult(result, partialResult);
 		}
 	}
 
-	return Boolean(result);
+	return !!result;
 }
-
-
 
 //console.log(JSON.stringify(getQueryKey(JSON.parse('{"or":[{"and":[{"is":{"gender":"male","age":23}},{"range":{"experience":{"gte":1,"lte":6}}}]},{"and":[{"like":{"image_url":"png","website":"png"}}]}]}'))));
 //console.log(parseQueryObject(JSON.parse('{"or":[{"and":[{"is":{"gender":"male","age":23}},{"range":{"experience":{"gte":1,"lte":6}}}]},{"and":[{"like":{"image_url":"png","website":"png"}}]}]}')));
