@@ -23,7 +23,8 @@ BuilderNode.FILTERS = [
 	'not',
 	'exists',
 	'range',
-	'in_array'
+	'in_array',
+	'like'
 ];
 
 BuilderNode.prototype.addFilter = function(name, value) {
