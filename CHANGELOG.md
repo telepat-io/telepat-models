@@ -1,3 +1,13 @@
+# 0.4.1
+
+* added default subscribe limit to Model.search
+* Bugfix: error handling when device is invalid
+* Implemented **like** filter
+* TelepatIndexedLists.get now returns the object if it's found
+* Bugfix: search no longer fails when an object has no mapping in ES
+* Bugfix: User() filters
+* ExpiredAuthorizationToken error status code should be 401
+
 # 0.4.0
 
 * Major performance improvements
