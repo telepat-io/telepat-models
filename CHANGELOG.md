@@ -1,3 +1,16 @@
+# 0.4.3.
+
+* ES adapter updateObjects implemented with retry-on-conflict strategy
+* Fixed bug when updating multiple fields
+
+# 0.4.2
+
+* Fixed ES 'like' filter
+* Fixed ES geolocation sorting
+* Implemented System messages
+* Support for multi-sort
+* fixed model.GetFiltersFromChannel when 'and' 'or' operators are direct parents/children
+
 # 0.4.1
 
 * added default subscribe limit to Model.search

@@ -31,6 +31,8 @@ module.exports.TelepatIndexedList = require('./lib/TelepatIndexedLists');
 
 module.exports.ConfigurationManager = require('./lib/ConfigurationManager');
 
+module.exports.SystemMessageProcessor = require('./lib/systemMessage');
+
 fs.readdirSync(__dirname+'/lib/message_queue').forEach(function(filename) {
 	var filenameParts = filename.split('_');
 
