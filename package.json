@@ -4,7 +4,7 @@
   "description": "Database models used by the Telepat API and Workers",
   "main": "index.js",
   "scripts": {
-	"test": "./node_modules/.bin/mocha --reporter spec"
+    "test": "./node_modules/istanbul/lib/cli.js cover _mocha -- ./test/telepatLib.js -R spec -s 1000"
   },
   "repository": {
     "type": "git",
@@ -55,7 +55,10 @@
     "winston-syslog": "1.2.1"
   },
   "devDependencies": {
-    "chai": "3.5.0",
-    "mocha": "3.1.0"
+    "chai": "chaijs/chai#master",
+    "chai-things": "chaijs/chai-things#master",
+    "istanbul": "0.4.5",
+    "mocha": "3.1.0",
+    "sinon": "1.17.6"
   }
 }
