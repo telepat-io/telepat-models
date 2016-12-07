@@ -1,6 +1,9 @@
 var common = require("../../common");
-var expect = common.expect;
-var assert = common.assert;
+var chai = require('chai');
+var expect = chai.expect;
+var assert = chai.assert;
+chai.should();
+chai.use(require('chai-things'));
 var sinon = require('sinon');
 var clone = require('clone');
 var async = require("async");
@@ -110,6 +113,7 @@ module.exports = function GetObjects(callback) {
 
 		it("Get multiple objects that should exist", function(done) {
 			var bulkOperations = [];
+			var objects = [];
 			var objectIds = [];
 
 			for(var i = 0; i < 1000; i++) {
@@ -119,6 +123,13 @@ module.exports = function GetObjects(callback) {
 					_id: id
 				}});
 				bulkOperations.push({
+					id: id,
+					type: "test",
+					square: i*i
+				});
+				objects.push({
+					id: id,
+					type: "test",
 					square: i*i
 				});
 				objectIds.push(id);
@@ -137,8 +148,8 @@ module.exports = function GetObjects(callback) {
 				function(cb) {
 					esAdapterConnection.getObjects(objectIds, function(errs, results, versions) {
 						expect(errs).to.be.empty;
-						expect(results).to.have.lengthOf(objectIds.length);
-						expect(Object.keys(versions)).to.have.lengthOf(objectIds.length);
+						expect(results).to.eql(objects);
+						expect(Object.keys(versions)).to.have.lengthOf(objects.length);
 						cb();
 					});
 				},
@@ -159,6 +170,7 @@ module.exports = function GetObjects(callback) {
 
 		it("Get multiple objects some of which shouldn't exist", function(done) {
 			var bulkOperations = [];
+			var objectsThatShouldBeReturned = [];
 			var objectIds = [];
 
 			for(var i = 0; i < 1000; i++) {
@@ -168,8 +180,17 @@ module.exports = function GetObjects(callback) {
 					_id: id
 				}});
 				bulkOperations.push({
+					id: id,
+					type: "test",
 					square: i*i
 				});
+
+				if (i % 25)
+					objectsThatShouldBeReturned.push({
+						id: id,
+						type: "test",
+						square: i*i
+					});
 				objectIds.push(i % 25 ? id : guid.v4());
 			}
 
@@ -186,7 +207,9 @@ module.exports = function GetObjects(callback) {
 				function(cb) {
 					esAdapterConnection.getObjects(objectIds, function(errs, results, versions) {
 						expect(errs).to.have.lengthOf(40);
-						expect(results).to.have.lengthOf(objectIds.length - 40);
+						errs.should.all.have.property("code", "034");
+
+						expect(results).to.eql(objectsThatShouldBeReturned);
 						expect(Object.keys(versions)).to.have.lengthOf(objectIds.length - 40);
 						cb();
 					});

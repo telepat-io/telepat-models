@@ -1,9 +1,12 @@
-var common = require("../../common");
-var expect = common.expect;
-var assert = common.assert;
+var common = require('../../common');
+var chai = require('chai');
+var expect = chai.expect;
+var assert = chai.assert;
+chai.should();
+chai.use(require('chai-things'));
 var sinon = require('sinon');
 var clone = require('clone');
-var async = require("async");
+var async = require('async');
 var es = require('elasticsearch');
 var guid = require('uuid');
 var esAdapter = require('../../../lib/database/elasticsearch_adapter');
@@ -11,18 +14,18 @@ var TelepatError = require('../../../lib/TelepatError');
 var TelepatLogger = require('../../../lib/logger/logger');
 
 module.exports = function CreateObjects(callback) {
-	describe("ElasticSearchDB.createObjects", function() {
+	describe('ElasticSearchDB.createObjects', function() {
 		after(function(done) {
 			afterTest(done, callback);
 		});
 
-		it("Call function with invalid argument", function(done) {
+		it('Call function with invalid argument', function(done) {
 			async.series([
 				function(cb) {
 					esAdapterConnection.createObjects(undefined, function(errs, results) {
 						expect(errs).to.have.lengthOf(1);
 						expect(errs[0]).to.be.instanceof(TelepatError);
-						expect(errs[0]).to.have.property("code", TelepatError.errors.InvalidFieldValue.code);
+						expect(errs[0]).to.have.property('code', TelepatError.errors.InvalidFieldValue.code);
 						expect(results).to.be.empty;
 						cb();
 					});
@@ -32,13 +35,13 @@ module.exports = function CreateObjects(callback) {
 			})
 		});
 
-		it("Call function with an empty array", function(done) {
+		it('Call function with an empty array', function(done) {
 			async.series([
 				function(cb) {
 					esAdapterConnection.createObjects(undefined, function(errs, results) {
 						expect(errs).to.have.lengthOf(1);
 						expect(errs[0]).to.be.instanceof(TelepatError);
-						expect(errs[0]).to.have.property("code", TelepatError.errors.InvalidFieldValue.code);
+						expect(errs[0]).to.have.property('code', TelepatError.errors.InvalidFieldValue.code);
 						expect(results).to.be.empty;
 						cb();
 					});
@@ -48,11 +51,11 @@ module.exports = function CreateObjects(callback) {
 			})
 		});
 
-		it("Call function with an object that doesn't have a type or an id", function(done) {
+		it('Call function with an object that doesn\'t have a type or an id', function(done) {
 			var obj = {
 				_id: 52490,
-				_type: "notok",
-				"test": "some value"
+				_type: 'notok',
+				test: 'some value'
 			};
 
 			var loggerWarning = sinon.spy(TelepatLogger.prototype, 'warning');
@@ -84,12 +87,12 @@ module.exports = function CreateObjects(callback) {
 			})
 		});
 
-		it("Create one simple object", function(done) {
+		it('Create one simple object', function(done) {
 			var objId = guid.v4();
 			var obj = {
 				id: objId,
-				type: "test",
-				field: "somefield value"
+				type: 'test',
+				field: 'somefield value'
 			};
 
 			async.series([
@@ -105,7 +108,7 @@ module.exports = function CreateObjects(callback) {
 						if (err)
 							return cb(err);
 
-						expect(res).to.have.property("found", true);
+						expect(res).to.have.property('found', true);
 						expect(res._source).to.deep.equal(obj);
 						cb();
 					});
@@ -113,7 +116,7 @@ module.exports = function CreateObjects(callback) {
 				function(cb) {
 					esConnection.delete({
 						index: esConfig.index,
-						type: "test",
+						type: 'test',
 						id: objId,
 						refresh: true
 					}, cb);
@@ -127,7 +130,7 @@ module.exports = function CreateObjects(callback) {
 			var objects = [];
 
 			for(var i=0; i < 1000; i++) {
-				objects.push({id: guid.v4(), type: "test", value: i*i});
+				objects.push({id: guid.v4(), type: 'test', value: i*i});
 			}
 
 			async.series([

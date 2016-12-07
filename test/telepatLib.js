@@ -1,4 +1,4 @@
-var common = require("./common");
+var common = require('./common');
 var expect = common.expect;
 var assert = common.assert;
 var es = require('elasticsearch');
@@ -15,8 +15,8 @@ Application.logger = new TelepatLogger({
 
 var tests = [
 	{
-		name: "ElasticSearch",
-		path: "database/elasticsearch/elasticsearch.js",
+		name: 'ElasticSearch',
+		path: 'database/elasticsearch/elasticsearch.js',
 		cleanup: function(callback) {
 			esConnection.indices.delete({index: common.config.ElasticSearch1.index}, function(err) {
 				if (err)
@@ -41,7 +41,7 @@ var tests = [
 	}
 ];
 
-describe("Telepat Models", function() {
+describe('Telepat Models', function() {
 	tests.forEach(function(t, i) {
 		describe((i+1) + '. ' + t.name, function() {
 			try {
@@ -61,8 +61,8 @@ describe("Telepat Models", function() {
 					after(t.cleanup);
 				}
 			} catch (e) {
-				if (e.code == "MODULE_NOT_FOUND") {
-					console.log("Test not found: " + t.path);
+				if (e.code == 'MODULE_NOT_FOUND') {
+					console.log('Test not found: ' + t.path);
 					process.exit(1);
 				} else
 					throw e;
