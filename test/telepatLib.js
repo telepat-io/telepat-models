@@ -44,28 +44,20 @@ var tests = [
 describe('Telepat Models', function() {
 	tests.forEach(function(t, i) {
 		describe((i+1) + '. ' + t.name, function() {
-			try {
-				if (t.before && t.before instanceof Function) {
-					before(function(done) {
-						setTimeout(function() {
-							t.before(done);
-						}, 1000);
-					});
-				}
+			if (t.before && t.before instanceof Function) {
+				before(function(done) {
+					setTimeout(function() {
+						t.before(done);
+					}, 1000);
+				});
+			}
 
-				this.timeout(10000);
+			this.timeout(10000);
 
-				require(__dirname + '/' + t.path);
+			require(__dirname + '/' + t.path);
 
-				if (t.cleanup && t.cleanup instanceof Function) {
-					after(t.cleanup);
-				}
-			} catch (e) {
-				if (e.code == 'MODULE_NOT_FOUND') {
-					console.log('Test not found: ' + t.path);
-					process.exit(1);
-				} else
-					throw e;
+			if (t.cleanup && t.cleanup instanceof Function) {
+				after(t.cleanup);
 			}
 		});
 	});

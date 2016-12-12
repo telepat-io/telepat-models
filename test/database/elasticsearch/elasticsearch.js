@@ -1,7 +1,7 @@
 var common = require('../../common');
 var clone = require('clone');
 var es = require('elasticsearch');
-var esAdapter = require('../../../lib/database/elasticsearch_adapter');
+var EsAdapter = require('../../../lib/database/elasticsearch_adapter');
 
 /**
  * @global
@@ -19,18 +19,16 @@ esConnection = new es.Client(clone(common.config.ElasticSearch1));
  * @global
  * @type {ElasticSearchDB|null}
  */
-esAdapterConnection = new esAdapter(clone(common.config.ElasticSearch1));
+esAdapterConnection = new EsAdapter(clone(common.config.ElasticSearch1));
 
 subTestIndex = 1;
 
 /**
- *
  * @global
  * @param {Function} done
  */
-afterTest = function(done, cb) {
+afterTest = function(done) {
 	done();
-	cb();
 };
 
 /**

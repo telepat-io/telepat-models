@@ -1,11 +1,11 @@
 exports.config = {
 	ElasticSearch1: {
-		host: 'localhost:9200',
+		host: '192.168.48.129:9200',
 		index: 'default_testing',
 		apiVersion: '1.7'
 	},
 	ElasticSearch2: {
-		hosts: ['localhost:9200'],
+		hosts: ['192.168.48.129:9200'],
 		index: 'default_testing',
 		apiVersion: '1.7'
 	},

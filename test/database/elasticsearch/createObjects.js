@@ -15,9 +15,7 @@ var TelepatLogger = require('../../../lib/logger/logger');
 
 module.exports = function CreateObjects(callback) {
 	describe('ElasticSearchDB.createObjects', function() {
-		after(function(done) {
-			afterTest(done, callback);
-		});
+		after(afterTest);
 
 		it('Call function with invalid argument', function(done) {
 			async.series([
@@ -102,7 +100,7 @@ module.exports = function CreateObjects(callback) {
 				function(cb) {
 					esConnection.get({
 						index: esConfig.index,
-						type: "test",
+						type: 'test',
 						id: objId
 					}, function(err, res) {
 						if (err)
@@ -156,8 +154,8 @@ module.exports = function CreateObjects(callback) {
 				function(cb) {
 					esConnection.delete({
 						index: esConfig.index,
-						type: "test",
-						id: "",
+						type: 'test',
+						id: '',
 						refresh: true
 					}, cb);
 				}
@@ -173,7 +171,7 @@ module.exports = function CreateObjects(callback) {
 			for(var i=0; i < 1000; i++) {
 				if (i % 25 && i % 50)
 					totalCreatedObjectCount++;
-				objects.push({id: i % 25 ? guid.v4() : undefined, type: i % 50 ? "test" : undefined, value: i*i});
+				objects.push({id: i % 25 ? guid.v4() : undefined, type: i % 50 ? 'test' : undefined, value: i*i});
 			}
 
 			var loggerWarning = sinon.spy(TelepatLogger.prototype, 'warning');
@@ -184,7 +182,7 @@ module.exports = function CreateObjects(callback) {
 						//we need a timeout because the index is not refreshed for non-builtin object types
 						setTimeout(function() {
 							cb(err);
-						}, 800);
+						}, 1000);
 
 						loggerWarning.restore();
 						sinon.assert.calledOnce(loggerWarning);
@@ -193,7 +191,7 @@ module.exports = function CreateObjects(callback) {
 				function(cb) {
 					esConnection.count({
 						index: esConfig.index,
-						type: "test"
+						type: 'test'
 					}, function(err, res) {
 						if (err)
 							return cb(err);
@@ -204,8 +202,8 @@ module.exports = function CreateObjects(callback) {
 				function(cb) {
 					esConnection.delete({
 						index: esConfig.index,
-						type: "test",
-						id: "",
+						type: 'test',
+						id: '',
 						refresh: true
 					}, cb);
 				}
@@ -329,8 +327,8 @@ module.exports = function CreateObjects(callback) {
 				function(cb) {
 					esConnection.delete({
 						index: esConfig.index,
-						type: "test",
-						id: "",
+						type: 'test',
+						id: '',
 						refresh: true
 					}, cb);
 				}
@@ -339,18 +337,18 @@ module.exports = function CreateObjects(callback) {
 			});
 		});
 
-		it("Catch an ES error (because, for example, the mapping doesn't match the mapping of another object)", function(done) {
+		it('Catch an ES error (because, for example, the mapping doesn\'t match the mapping of another object)', function(done) {
 			var objId = guid.v4();
 			var obj = {
 				id: objId,
-				type: "context",
+				type: 'context',
 				float: 32.2
 			};
 
 			var invalidObj = {
 				id: guid.v4(),
-				type: "context",
-				float: "this should a float, not a string"
+				type: 'context',
+				float: 'this should a float, not a string'
 			};
 
 			var errorLog = sinon.spy(TelepatLogger.prototype, 'error');
@@ -372,7 +370,7 @@ module.exports = function CreateObjects(callback) {
 				function(cb) {
 					esConnection.count({
 						index: esConfig.index,
-						type: "context"
+						type: 'context'
 					}, function(err, res) {
 						if (err)
 							return cb(err);
@@ -384,7 +382,7 @@ module.exports = function CreateObjects(callback) {
 				function(cb) {
 					esConnection.delete({
 						index: esConfig.index,
-						type: "context",
+						type: 'context',
 						id: objId,
 						refresh: true
 					}, cb);
