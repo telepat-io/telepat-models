@@ -704,7 +704,7 @@ module.exports = function UpdateObjects(callback) {
 
 			var modifiedObject = {
 				id: initialObject,
-				type: "test",
+				type: 'test',
 				value1: 'x6',
 				value2: 4,
 				value3: 'hahahaha'
@@ -727,7 +727,7 @@ module.exports = function UpdateObjects(callback) {
 						patches.push(
 							{
 								op: 'replace',
-								path: initialObject.type + "/" + initialObject.id + '/value1',
+								path: initialObject.type + '/' + initialObject.id + '/value1',
 								value: 'x' + ((i+1)*2)
 							},
 							{
