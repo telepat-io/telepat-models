@@ -41,9 +41,11 @@ afterSubTest = function(done, err) {
 };
 
 var tests = [
+	require('./constructor'),
 	require('./getObjects'),
 	require('./createObjects'),
-	require('./updateObjects')
+	require('./updateObjects'),
+	require('./deleteObjects')
 ];
 
 tests.forEach(function(t) {

@@ -7,7 +7,7 @@ chai.use(require('chai-things'));
 
 var sinon = require('sinon');
 var clone = require('clone');
-var async = require("async");
+var async = require('async');
 var es = require('elasticsearch');
 var guid = require('uuid');
 var esAdapter = require('../../../lib/database/elasticsearch_adapter');
@@ -676,8 +676,7 @@ module.exports = function UpdateObjects(callback) {
 							return cb(err);
 
 						expect(res.found).to.be.true;
-						expect(res._version).to.be.at.least(2);
-						expect(res._source.value).to.be.equal(modifiedObject.value);
+						expect(res._version).to.be.equal(6);
 						cb();
 					})
 				},
@@ -700,14 +699,6 @@ module.exports = function UpdateObjects(callback) {
 				value1: 'some string',
 				value2: 1,
 				value3: 'ha'
-			};
-
-			var modifiedObject = {
-				id: initialObject,
-				type: 'test',
-				value1: 'x6',
-				value2: 4,
-				value3: 'hahahaha'
 			};
 
 			async.series([
@@ -765,11 +756,9 @@ module.exports = function UpdateObjects(callback) {
 						if (err)
 							return cb(err);
 
+						//we can't assert the final values because the updates are not executed in order
 						expect(res.found).to.be.true;
-						expect(res._version).to.be.at.least(2);
-						expect(res._source).to.have.property('value1', modifiedObject.value1);
-						expect(res._source).to.have.property('value2', modifiedObject.value2);
-						expect(res._source).to.have.property('value3', modifiedObject.value3);
+						expect(res._version).to.be.equal(10);
 						cb();
 					})
 				},
