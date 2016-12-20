@@ -13,7 +13,7 @@ var esAdapter = require('../../../lib/database/elasticsearch_adapter');
 var TelepatError = require('../../../lib/TelepatError');
 var TelepatLogger = require('../../../lib/logger/logger');
 
-module.exports = function CreateObjects(callback) {
+module.exports = function CreateObjects() {
 	describe('ElasticSearchDB.createObjects', function() {
 		after(afterTest);
 

@@ -16,7 +16,7 @@ Application.logger = new TelepatLogger({
 var tests = [
 	{
 		name: 'ElasticSearch',
-		path: 'database/elasticsearch/elasticsearch.js',
+		path: 'database/elasticsearch/elasticsearchTests.js',
 		cleanup: function(callback) {
 			esConnection.indices.delete({index: common.config.ElasticSearch1.index}, function(err) {
 				if (err)
@@ -38,6 +38,10 @@ var tests = [
 				}
 			});
 		}
+	},
+	{
+		name: 'Filter builder',
+		path: 'utils/filterbuilderTests.js'
 	}
 ];
 

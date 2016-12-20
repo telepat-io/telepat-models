@@ -13,7 +13,7 @@ var esAdapter = require('../../../lib/database/elasticsearch_adapter');
 var TelepatError = require('../../../lib/TelepatError');
 var TelepatLogger = require('../../../lib/logger/logger');
 
-module.exports = function DeleteObjects(callback) {
+module.exports = function DeleteObjects() {
 	describe('ElasticSearch.deleteObjects', function() {
 		after(afterTest);
 

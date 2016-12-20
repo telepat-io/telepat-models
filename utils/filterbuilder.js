@@ -1,8 +1,9 @@
 var TelepatError = require('../lib/TelepatError');
 
 var BuilderNode = function(name) {
-	if (BuilderNode.CONNECTORS.indexOf(name) === -1)
+	if (BuilderNode.CONNECTORS.indexOf(name) === -1) {
 		throw new TelepatError(TelepatError.errors.QueryError, ['unsupported query connector "'+name+'"']);
+	}
 
 	this.parent = null;
 	/**

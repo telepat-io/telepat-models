@@ -14,10 +14,10 @@ var esAdapter = require('../../../lib/database/elasticsearch_adapter');
 var TelepatError = require('../../../lib/TelepatError');
 var TelepatLogger = require('../../../lib/logger/logger');
 
-module.exports = function UpdateObjects(callback) {
+module.exports = function UpdateObjects() {
 	describe('ElasticSearchDB.updateObjects', function() {
 		after(function(done) {
-			afterTest(done, callback);
+			afterTest(done);
 		});
 
 		it('Call function with invalid argument type', function(done) {

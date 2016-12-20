@@ -11,10 +11,10 @@ var esAdapter = require('../../../lib/database/elasticsearch_adapter');
 var TelepatError = require('../../../lib/TelepatError');
 var TelepatLogger = require('../../../lib/logger/logger');
 
-module.exports = function Constructor(callback) {
+module.exports = function Constructor() {
 	describe('ElasticSearchDB.constructor', function() {
 		after(function(done) {
-			afterTest(done, callback);
+			afterTest(done);
 		});
 
 		it('Should fail because configuration parameter is missing or not valid param', function(done) {
