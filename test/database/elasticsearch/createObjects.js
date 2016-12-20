@@ -143,7 +143,7 @@ module.exports = function CreateObjects(callback) {
 				function(cb) {
 					esConnection.count({
 						index: esConfig.index,
-						type: "test"
+						type: 'test'
 					}, function(err, res) {
 						if (err)
 							return cb(err);
