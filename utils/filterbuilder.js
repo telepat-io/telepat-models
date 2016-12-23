@@ -28,13 +28,31 @@ BuilderNode.FILTERS = [
 	'like'
 ];
 
+/**
+ * @param {string} name
+ * @param {Object|string} value
+ */
 BuilderNode.prototype.addFilter = function(name, value) {
 	if (BuilderNode.FILTERS.indexOf(name) !== -1) {
+		if (value === undefined) {
+			throw new TelepatError(TelepatError.errors.QueryError, ['filter value is undefined']);
+		}
+
+		if (['is', 'exists', 'in_array', 'like'].indexOf(name) !== -1 && typeof value !== 'string') {
+			throw new TelepatError(TelepatError.errors.QueryError, ['filter value for ' + name + ' must be a string']);
+		}
+
+		if (['not', 'range'].indexOf(name) !== -1 && typeof value !== 'object') {
+			throw new TelepatError(TelepatError.errors.QueryError, ['filter value for ' + name + ' must be an object']);
+		}
+
 		var filter = {};
 		filter[name] = value;
+
 		this.children.push(filter);
-	} else
+	} else {
 		throw new TelepatError(TelepatError.errors.QueryError, ['invalid filter "'+name+'"']);
+	}
 };
 
 /**
@@ -42,6 +60,11 @@ BuilderNode.prototype.addFilter = function(name, value) {
  * @param {BuilderNode} node
  */
 BuilderNode.prototype.addNode = function(node) {
+	if (!(node instanceof BuilderNode)) {
+		throw new TelepatError(TelepatError.errors.ServerFailure,
+			['BuilderNode.addNode: argument must be instanceof BuilderNode']);
+	}
+
 	node.parent = this;
 	this.children.push(node);
 };
@@ -51,6 +74,11 @@ BuilderNode.prototype.addNode = function(node) {
  * @param {BuilderNode} node
  */
 BuilderNode.prototype.removeNode = function(node) {
+	if (!(node instanceof BuilderNode)) {
+		throw new TelepatError(TelepatError.errors.ServerFailure,
+			['BuilderNode.addNode: argument must be instanceof BuilderNode']);
+	}
+
 	var idx = this.children.indexOf(node);
 
 	if (idx !== -1) {

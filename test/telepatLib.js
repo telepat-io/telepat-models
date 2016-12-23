@@ -15,6 +15,10 @@ Application.logger = new TelepatLogger({
 
 var tests = [
 	{
+		name: 'Filter builder',
+		path: 'utils/filterbuilderTests.js'
+	},
+	{
 		name: 'ElasticSearch',
 		path: 'database/elasticsearch/elasticsearchTests.js',
 		cleanup: function(callback) {
@@ -38,10 +42,6 @@ var tests = [
 				}
 			});
 		}
-	},
-	{
-		name: 'Filter builder',
-		path: 'utils/filterbuilderTests.js'
 	}
 ];
 
