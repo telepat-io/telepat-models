@@ -32,12 +32,8 @@ const init = callback => {
 };
 
 const appsModule = new Proxy({
-	create: (props, callback) => {
-		return new Application(props);
-	},
-	get: () => {
-		return Application.apps;
-	}
+	new: Application.new,
+	get: Application.get
 }, {
 	get: (object, prop) => {
 		if (!config) {
