@@ -1,42 +1,55 @@
-var fs = require('fs');
+const async = require('async');
 
-module.exports.Application = require('./lib/Application');
+const Application = require('./lib/Application'),
+	ConfigurationManager = require('./lib/ConfigurationManager');
 
-module.exports.Context = require('./lib/Context');
+let config;
 
-module.exports.Model = require('./lib/Model');
+const init = callback => {
+	let configManager = new ConfigurationManager('./config.spec.json', './config.json');
 
-module.exports.Subscription = require('./lib/Subscription');
+	async.series([
+		seriesCallback => {
+			configManager.load(err => {
+				if (err) {
+					return seriesCallback(err);
+				}
 
-module.exports.Admin = require('./lib/Admin');
+				let testResult = configManager.test();
 
-module.exports.User = require('./lib/User');
+				if (testResult === true) {
+					config = configManager.config;
 
-module.exports.utils = require('./utils/utils');
-module.exports.Builders = require('./utils/filterbuilder');
+					seriesCallback();
+				} else {
+					seriesCallback(testResult);
+				}
+			});
+		}
+	], callback);
 
-module.exports.Channel = require('./lib/Channel');
-module.exports.Delta = require('./lib/Delta');
 
-module.exports.ProfilingContext = require('./utils/profiling');
+};
 
-module.exports.TelepatError = require('./lib/TelepatError');
+const appsModule = new Proxy({
+	new: Application.new,
+	get: Application.get
+}, {
+	get: (object, prop) => {
+		if (!config) {
+			throw new Error('Not initialized'); // TODO: improve
+		}
 
-module.exports.Datasource = require('./lib/database/datasource');
-module.exports.ElasticSearch = require('./lib/database/elasticsearch_adapter');
+		if (typeof object[prop] === 'function') {
+			return object[prop];
+		}
 
-module.exports.TelepatLogger = require('./lib/logger/logger');
-
-module.exports.TelepatIndexedList = require('./lib/TelepatIndexedLists');
-
-module.exports.ConfigurationManager = require('./lib/ConfigurationManager');
-
-module.exports.SystemMessageProcessor = require('./lib/systemMessage');
-
-fs.readdirSync(__dirname+'/lib/message_queue').forEach(function(filename) {
-	var filenameParts = filename.split('_');
-
-	if (filenameParts.pop() == 'queue.js') {
-		module.exports[filenameParts.join('_')] = require('./lib/message_queue/'+filename);
+		return object.get(prop);
 	}
 });
+
+module.exports = {
+	init,
+	config,
+	apps: appsModule
+};
