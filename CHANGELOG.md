@@ -1,3 +1,20 @@
+# 0.4.4
+
+* Updated `apn` package which uses the new HTTP/2 protocol which should make much more reliable and faster
+* The array containing the devices' subscription in the device object have been moved to a dedicated redis key
+* Implemented configuration manager used for validating the config file
+* Subscription elements in the redis key now contain the device ID
+* Implemented `Subscription.removeAllSubscriptionsFromDevice`
+* `Subscription.getAllDevices` device identifier changed to "device.id|device.token"
+* `Subscription.remove` accepts token as an optional argument
+* `User.update` now returns the updated user object
+* Subscription methods should take `device.volatile.active` into account when adding/removing subscriptions
+* BUGFIX: `utils.testObject` has been rewritten and should be bug free now
+* BUGFIX: fixed incomplete filters when a complex filter contained the AND connector
+* BUGFIX: fixed object updates if an object field's contain " or ' characters
+* BUGFIX: fixed `Subscription.add` when `device.persistent` is missing
+* BUGFIX: Removed count LOCK key in redis if transaction fails
+
 # 0.4.3.
 
 * ES adapter updateObjects implemented with retry-on-conflict strategy
