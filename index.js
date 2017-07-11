@@ -5,18 +5,19 @@ const Application = require('./lib/Application'),
 	ConfigurationManager = require('./lib/ConfigurationManager'),
 	Datasource = require('./lib/database/datasource'),
 	TelepatLogger = require('./lib/logger/logger'),
+	Services = require('./lib/Services');
 	SystemMessageProcessor = require('./lib/systemMessage');
 let config, logger, datasource;
 
-let models = {
+let acceptedServices = {
 	ElasticSearch: require('./lib/database/elasticsearch_adapter')	
 }
 
 fs.readdirSync(__dirname+'/lib/message_queue').forEach(function(filename) {
-	var filenameParts = filename.split('_');
-
+	let filenameParts = filename.split('_');
+	console.log(filenameParts.join('_'), filename);
 	if (filenameParts.pop() == 'queue.js') {
-		models[filenameParts.join('_')] = require('./lib/message_queue/'+filename);
+		acceptedServices[filenameParts.join('_')] = require('./lib/message_queue/'+filename);
 	}
 });
 
@@ -44,9 +45,9 @@ const init = (name, callback) => {
 		seriesCallback => {
 			if (config.logger) {
 				config.logger.name = name +(process.env.PORT || 3000);
-				Application.logger = new TelepatLogger(config.logger);
+				Services.logger = new TelepatLogger(config.logger);
 			} else {
-				Application.logger = new TelepatLogger({
+				Services.logger = new TelepatLogger({
 					type: 'Console',
 					name: name+(process.env.PORT || 3000),
 					settings: {level: 'info'}
@@ -54,46 +55,46 @@ const init = (name, callback) => {
 			};
 			let mainDatabase = config.main_database;
 		
-			if (!models[mainDatabase]) {
-				Application.logger.emergency('Unable to load "' + mainDatabase + '" main database: not found. Aborting...');
+			if (!acceptedServices[mainDatabase]) {
+				Services.logger.emergency('Unable to load "' + mainDatabase + '" main database: not found. Aborting...');
 				process.exit(2);
 			}
 			
-			Application.datasource = new Datasource();
-			Application.datasource.setMainDatabase(new models[mainDatabase](config[mainDatabase]));
+			Services.datasource = new Datasource();
+			Services.datasource.setMainDatabase(new acceptedServices[mainDatabase](config[mainDatabase]));
 			seriesCallback();
 		},
 		seriesCallback => {
 			console.log('here');
-			Application.datasource.dataStorage.onReady(function() {
+			Services.datasource.dataStorage.onReady(function() {
 				seriesCallback();
 			});
 		},
 		seriesCallback => {
-			if (Application.redisClient) {
-				Application.redisClient = null;
+			if (Services.redisClient) {
+				Services.redisClient = null;
 			}
 			let redisConf = config.redis;
 			let retry_strategy = function(options) {
 				if (options.error && (options.error.code === 'ETIMEDOUT' || options.error.code === 'ECONNREFUSED'))
 					return 1000;
 
-				Application.logger.error('Redis server connection lost "'+redisConf.host+'". Retrying...');
+				Services.logger.error('Redis server connection lost "'+redisConf.host+'". Retrying...');
 				// reconnect after
 				return 3000;
 			};
 
-			Application.redisClient = redis.createClient({
+			Services.redisClient = redis.createClient({
 				port: redisConf.port,
 				host: redisConf.host,
 				retry_strategy: retry_strategy
 			});
-			Application.redisClient.on('error', function(err) {
-				Application.logger.error('Failed connecting to Redis "' + redisConf.host + '": ' +
+			Services.redisClient.on('error', function(err) {
+				Services.logger.error('Failed connecting to Redis "' + redisConf.host + '": ' +
 					err.message + '. Retrying...');
 			});
-			Application.redisClient.on('ready', function() {
-				Application.logger.info('Client connected to Redis.');
+			Services.redisClient.on('ready', function() {
+				Services.logger.info('Client connected to Redis.');
 				seriesCallback();
 			});
 		}, 
@@ -106,7 +107,7 @@ const init = (name, callback) => {
 				if (options.error && (options.error.code === 'ETIMEDOUT' || options.error.code === 'ECONNREFUSED'))
 					return 1000;
 
-				Application.logger.error('Redis cache server connection lost "'+redisCacheConf.host+'". Retrying...');
+				Services.logger.error('Redis cache server connection lost "'+redisCacheConf.host+'". Retrying...');
 
 				// reconnect after
 				return 3000;
@@ -118,21 +119,21 @@ const init = (name, callback) => {
 				retry_strategy: retry_strategy
 			});
 			Application.redisCacheClient.on('error', function(err) {
-				Application.logger.error('Failed connecting to Redis Cache "' + redisCacheConf.host + '": ' +
+				Services.logger.error('Failed connecting to Redis Cache "' + redisCacheConf.host + '": ' +
 					err.message + '. Retrying...');
 			});
 			Application.redisCacheClient.on('ready', function() {
-				Application.logger.info('Client connected to Redis Cache.');
+				Services.logger.info('Client connected to Redis Cache.');
 				seriesCallback();
 			});
 		},
 		seriesCallback => {
 			name = 'api';
-			var messagingClient = config.message_queue;
-			var clientConfiguration = config[messagingClient];
+			let messagingClient = config.message_queue;
+			let clientConfiguration = config[messagingClient];
 			
-			if (!models[messagingClient]) {
-				Application.logger.error('Unable to load "'+messagingClient+'" messaging queue: not found. ' +
+			if (!acceptedServices[messagingClient]) {
+				Services.logger.error('Unable to load "'+messagingClient+'" messaging queue: not found. ' +
 				'Aborting...');
 				process.exit(5);
 			}
@@ -141,14 +142,14 @@ const init = (name, callback) => {
 			/**
 			 * @type {MessagingClient}
 			 */
-			Application.messagingClient = new models[messagingClient](clientConfiguration, 'telepat-'+name, name);
-			Application.messagingClient.onReady(function() {
+			Services.messagingClient = new acceptedServices[messagingClient](clientConfiguration, 'telepat-'+name, name);
+			Services.messagingClient.onReady(function() {
 
-				Application.messagingClient.onMessage(function(message) {
-					var parsedMessage = JSON.parse(message);
+				Services.messagingClient.onMessage(function(message) {
+					let parsedMessage = JSON.parse(message);
 					SystemMessageProcessor.identity = name;
 					if (parsedMessage._systemMessage) {
-						Application.logger.debug('Got system message: "'+message+'"');
+						Services.logger.debug('Got system message: "'+message+'"');
 						SystemMessageProcessor.process(parsedMessage);
 					}
 				});
@@ -166,6 +167,7 @@ const appsModule = new Proxy({
 	get: Application.get
 }, {
 	get: (object, prop) => {
+		console.log(prop);
 		if (!config) {
 			throw new Error('Not initialized'); // TODO: improve
 		}
