@@ -52,7 +52,7 @@ const init = (name, callback) => {
 					name: name+(process.env.PORT || 3000),
 					settings: {level: 'info'}
 				});
-			};
+			}
 			let mainDatabase = config.main_database;
 		
 			if (!acceptedServices[mainDatabase]) {
@@ -65,7 +65,6 @@ const init = (name, callback) => {
 			seriesCallback();
 		},
 		seriesCallback => {
-			console.log('here');
 			Services.datasource.dataStorage.onReady(function() {
 				seriesCallback();
 			});
@@ -99,11 +98,12 @@ const init = (name, callback) => {
 			});
 		}, 
 		seriesCallback => {
-			if (Application.redisCacheClient)	redis = require('redis');
-				Application.redisCacheClient = null;
+			if (Services.redisCacheClient) {
+				Services.redisCacheClient = null;
+			}
 
 			let redisCacheConf = config.redisCache;
-			let retry_strategy = function(options) {
+			let retry_strategy = (options) => {
 				if (options.error && (options.error.code === 'ETIMEDOUT' || options.error.code === 'ECONNREFUSED'))
 					return 1000;
 
@@ -113,16 +113,16 @@ const init = (name, callback) => {
 				return 3000;
 			};
 
-			Application.redisCacheClient = redis.createClient({
+			Services.redisCacheClient = redis.createClient({
 				port: redisCacheConf.port,
 				host: redisCacheConf.host,
 				retry_strategy: retry_strategy
 			});
-			Application.redisCacheClient.on('error', function(err) {
+			Services.redisCacheClient.on('error', (err) => {
 				Services.logger.error('Failed connecting to Redis Cache "' + redisCacheConf.host + '": ' +
 					err.message + '. Retrying...');
 			});
-			Application.redisCacheClient.on('ready', function() {
+			Services.redisCacheClient.on('ready', () => {
 				Services.logger.info('Client connected to Redis Cache.');
 				seriesCallback();
 			});
@@ -144,7 +144,6 @@ const init = (name, callback) => {
 			 */
 			Services.messagingClient = new acceptedServices[messagingClient](clientConfiguration, 'telepat-'+name, name);
 			Services.messagingClient.onReady(function() {
-
 				Services.messagingClient.onMessage(function(message) {
 					let parsedMessage = JSON.parse(message);
 					SystemMessageProcessor.identity = name;
@@ -159,25 +158,22 @@ const init = (name, callback) => {
 		
 	], callback);
 
-
 };
 
 const appsModule = new Proxy({
-	new: Application.new,
-	get: Application.get
+	new: Application.new, 
+	get: Application.get,
+	getAll: Application.getAll
 }, {
 	get: (object, prop) => {
-		console.log(prop);
 		if (!config) {
 			throw new Error('Not initialized'); // TODO: improve
 		}
-
 		if (typeof object[prop] === 'function') {
 			return object[prop];
 		}
-
 		return object.get(prop);
-	}
+	},
 });
 
 
