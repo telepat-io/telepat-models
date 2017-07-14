@@ -6,7 +6,8 @@ const Application = require('./lib/Application'),
 	Datasource = require('./lib/database/datasource'),
 	TelepatLogger = require('./lib/logger/logger'),
 	Services = require('./lib/Services');
-	SystemMessageProcessor = require('./lib/systemMessage');
+	SystemMessageProcessor = require('./lib/systemMessage'),
+	Model = require('./lib/Model');
 let config, logger, datasource;
 
 let acceptedServices = {
@@ -176,9 +177,19 @@ const appsModule = new Proxy({
 	},
 });
 
+// const models = new Proxy({
+// 	update: Model.update,
+// 	detele: Models.delete
+// }, {
+// 	get: (object, prop) => {
+// 		return object[prop];
+// 	},
+
+// });
 
 module.exports = {
 	init,
 	config,
-	apps: appsModule
+	apps: appsModule,
+	//models: models
 };
