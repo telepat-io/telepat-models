@@ -14,7 +14,7 @@ let acceptedServices = {
 	ElasticSearch: require('./lib/database/elasticsearch_adapter')	
 }
 
-fs.readdirSync(__dirname+'/lib/message_queue').forEach(function(filename) {
+fs.readdirSync(__dirname+'/lib/message_queue').forEach((filename) => {
 	let filenameParts = filename.split('_');
 	if (filenameParts.pop() == 'queue.js') {
 		acceptedServices[filenameParts.join('_')] = require('./lib/message_queue/'+filename);
@@ -65,7 +65,7 @@ const init = (name, callback) => {
 			seriesCallback();
 		},
 		seriesCallback => {
-			Services.datasource.dataStorage.onReady(function() {
+			Services.datasource.dataStorage.onReady(() => {
 				seriesCallback();
 			});
 		},
@@ -74,7 +74,7 @@ const init = (name, callback) => {
 				Services.redisClient = null;
 			}
 			let redisConf = config.redis;
-			let retry_strategy = function(options) {
+			let retry_strategy = (options) => {
 				if (options.error && (options.error.code === 'ETIMEDOUT' || options.error.code === 'ECONNREFUSED'))
 					return 1000;
 
@@ -88,11 +88,11 @@ const init = (name, callback) => {
 				host: redisConf.host,
 				retry_strategy: retry_strategy
 			});
-			Services.redisClient.on('error', function(err) {
+			Services.redisClient.on('error', (err) => {
 				Services.logger.error('Failed connecting to Redis "' + redisConf.host + '": ' +
 					err.message + '. Retrying...');
 			});
-			Services.redisClient.on('ready', function() {
+			Services.redisClient.on('ready', () => {
 				Services.logger.info('Client connected to Redis.');
 				seriesCallback();
 			});
@@ -143,8 +143,8 @@ const init = (name, callback) => {
 			 * @type {MessagingClient}
 			 */
 			Services.messagingClient = new acceptedServices[messagingClient](clientConfiguration, 'telepat-'+name, name);
-			Services.messagingClient.onReady(function() {
-				Services.messagingClient.onMessage(function(message) {
+			Services.messagingClient.onReady(() => {
+				Services.messagingClient.onMessage((message) => {
 					let parsedMessage = JSON.parse(message);
 					SystemMessageProcessor.identity = name;
 					if (parsedMessage._systemMessage) {
