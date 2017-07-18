@@ -16,7 +16,6 @@ let acceptedServices = {
 
 fs.readdirSync(__dirname+'/lib/message_queue').forEach(function(filename) {
 	let filenameParts = filename.split('_');
-	console.log(filenameParts.join('_'), filename);
 	if (filenameParts.pop() == 'queue.js') {
 		acceptedServices[filenameParts.join('_')] = require('./lib/message_queue/'+filename);
 	}
@@ -159,12 +158,14 @@ const init = (name, callback) => {
 		
 	], callback);
 
+
 };
 
 const appsModule = new Proxy({
 	new: Application.new, 
 	get: Application.get,
-	getAll: Application.getAll
+	getAll: Application.getAll,
+	models: Model
 }, {
 	get: (object, prop) => {
 		if (!config) {
@@ -177,19 +178,9 @@ const appsModule = new Proxy({
 	},
 });
 
-// const models = new Proxy({
-// 	update: Model.update,
-// 	detele: Models.delete
-// }, {
-// 	get: (object, prop) => {
-// 		return object[prop];
-// 	},
-
-// });
-
 module.exports = {
 	init,
 	config,
 	apps: appsModule,
-	//models: models
+	db: Services.datasource
 };
