@@ -1,17 +1,65 @@
-var TelepatError = require('../lib/TelepatError');
+let TelepatError = require('../lib/TelepatError');
+class BuilderNode {
+    constructor(name) {
+        if (!BuilderNode.CONNECTORS.includes(name))
+            throw new TelepatError(TelepatError.errors.QueryError, [`unsupported query connector "${name}"`]);
 
-var BuilderNode = function(name) {
-	if (BuilderNode.CONNECTORS.indexOf(name) === -1)
-		throw new TelepatError(TelepatError.errors.QueryError, ['unsupported query connector "'+name+'"']);
+        this.parent = null;
+        /**
+         *
+         * @type {BuilderNode[]|Object[]}
+         */
+        this.children = [];
+        this.name = name;
+    }
 
-	this.parent = null;
-	/**
-	 *
-	 * @type {BuilderNode[]|Object[]}
-	 */
-	this.children = [];
-	this.name = name;
-};
+    addFilter(name, value) {
+        if (BuilderNode.FILTERS.includes(name)) {
+            let filter = {};
+            filter[name] = value;
+            this.children.push(filter);
+        } else
+            throw new TelepatError(TelepatError.errors.QueryError, [`invalid filter "${name}"`]);
+    }
+
+    /**
+     *
+     * @param {BuilderNode} node
+     */
+    addNode(node) {
+        node.parent = this;
+        this.children.push(node);
+    }
+
+    /**
+     *
+     * @param {BuilderNode} node
+     */
+    removeNode(node) {
+        let idx = this.children.indexOf(node);
+
+        if (idx !== -1) {
+            node.parent = null;
+            return this.children.splice(idx, 1)[0];
+        } else {
+            return null;
+        }
+    }
+
+    toObject() {
+        let obj = {};
+        obj[this.name] = [];
+
+        this.children.forEach((item) => {
+            if (item instanceof BuilderNode)
+                obj[this.name].push(item.toObject());
+            else
+                obj[this.name].push(item);
+        }, this);
+
+        return obj;
+    }
+}
 
 BuilderNode.CONNECTORS = [
 	'and',
@@ -27,124 +75,79 @@ BuilderNode.FILTERS = [
 	'like'
 ];
 
-BuilderNode.prototype.addFilter = function(name, value) {
-	if (BuilderNode.FILTERS.indexOf(name) !== -1) {
-		var filter = {};
-		filter[name] = value;
-		this.children.push(filter);
-	} else
-		throw new TelepatError(TelepatError.errors.QueryError, ['invalid filter "'+name+'"']);
-};
+class FilterBuilder {
+    constructor(initial) {
+        /**
+         *
+         * @type {null|BuilderNode}
+         */
+        this.root = null;
 
-/**
- *
- * @param {BuilderNode} node
- */
-BuilderNode.prototype.addNode = function(node) {
-	node.parent = this;
-	this.children.push(node);
-};
+        if (initial)
+            this.root = new BuilderNode(initial);
+        else
+            this.root = new BuilderNode('and');
 
-/**
- *
- * @param {BuilderNode} node
- */
-BuilderNode.prototype.removeNode = function(node) {
-	var idx = this.children.indexOf(node);
+        this.pointer = this.root;
+    }
 
-	if (idx !== -1) {
-		node.parent = null;
-		return this.children.splice(idx, 1)[0];
-	} else {
-		return null;
-	}
-};
+    and() {
+        if (this.root === null) {
+            this.root = new BuilderNode('and');
+        } else {
+            let child = new BuilderNode('and');
+            this.pointer.addNode(child);
+            this.pointer = child;
+        }
 
-BuilderNode.prototype.toObject = function() {
-	var obj = {};
-	obj[this.name] = [];
+        return this;
+    }
 
-	this.children.forEach(function(item) {
-		if (item instanceof BuilderNode)
-			obj[this.name].push(item.toObject());
-		else
-			obj[this.name].push(item);
-	}, this);
+    or() {
+        if (this.root === null) {
+            this.root = new BuilderNode('or');
+        } else {
+            let child = new BuilderNode('or');
+            this.pointer.addNode(child);
+            this.pointer = child;
+        }
 
-	return obj;
-};
+        return this;
+    }
 
-var FilterBuilder = function(initial) {
-	/**
-	 *
-	 * @type {null|BuilderNode}
-	 */
-	this.root = null;
+    addFilter(name, value) {
+        this.pointer.addFilter(name, value);
 
-	if (initial)
-		this.root = new BuilderNode(initial);
-	else
-		this.root = new BuilderNode('and');
+        return this;
+    }
 
-	this.pointer = this.root;
-};
+    removeNode() {
+        if (this.root !== this.pointer) {
+            let nodeToRemove = this.pointer;
+            this.pointer = this.pointer.parent;
 
-FilterBuilder.prototype.and = function() {
-	if (this.root === null) {
-		this.root = new BuilderNode('and');
-	} else {
-		var child = new BuilderNode('and');
-		this.pointer.addNode(child);
-		this.pointer = child;
-	}
+            return this.pointer.removeNode(nodeToRemove);
+        } else
+            return null;
+    }
 
-	return this;
-};
+    isEmpty() {
+        return this.root.children.length ? false : true;
+    }
 
-FilterBuilder.prototype.or = function() {
-	if (this.root === null) {
-		this.root = new BuilderNode('or');
-	} else {
-		var child = new BuilderNode('or');
-		this.pointer.addNode(child);
-		this.pointer = child;
-	}
+    end() {
+        if (this.pointer.parent)
+            this.pointer = this.pointer.parent;
 
-	return this;
-};
+        return this;
+    }
 
-FilterBuilder.prototype.addFilter = function(name, value) {
-	this.pointer.addFilter(name, value);
+    build() {
+        return this.root ? this.root.toObject() : null;
+    }
+}
 
-	return this;
-};
-
-FilterBuilder.prototype.removeNode = function() {
-	if (this.root !== this.pointer) {
-		var nodeToRemove = this.pointer;
-		this.pointer = this.pointer.parent;
-
-		return this.pointer.removeNode(nodeToRemove);
-	} else
-		return null;
-};
-
-FilterBuilder.prototype.isEmpty = function() {
-	return this.root.children.length ? false : true;
-};
-
-FilterBuilder.prototype.end = function() {
-	if (this.pointer.parent)
-		this.pointer = this.pointer.parent;
-
-	return this;
-};
-
-FilterBuilder.prototype.build = function() {
-	return this.root ? this.root.toObject() : null;
-};
-
-/*var FB = new FilterBuilder('and');
+/*let FB = new FilterBuilder('and');
 FB.
 	or().
 		addFilter('is', {a: 1}).
@@ -157,6 +160,6 @@ FB.
 		addFilter('is', {f: 6});*/
 
 module.exports = {
-	FilterBuilder: FilterBuilder,
-	BuilderNode: BuilderNode
+	FilterBuilder,
+	BuilderNode
 };
