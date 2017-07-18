@@ -183,7 +183,6 @@ function testObject(object, query) {
 
 					case 'or':
 					case 'and': {
-						//console.log(query[mainOperator][i]);
 						partialResult = testObject(object, query[mainOperator][i]);
 
 						break;
