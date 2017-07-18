@@ -5,10 +5,11 @@ const Application = require('./lib/Application'),
 	ConfigurationManager = require('./lib/ConfigurationManager'),
 	Datasource = require('./lib/database/datasource'),
 	TelepatLogger = require('./lib/logger/logger'),
-	Services = require('./lib/Services');
+	Services = require('./lib/Services'),
 	SystemMessageProcessor = require('./lib/systemMessage'),
+	FilterBuilder = require('./utils/filterbuilder').FilterBuilder,
 	Model = require('./lib/Model');
-let config, logger, datasource;
+let config;
 
 let acceptedServices = {
 	ElasticSearch: require('./lib/database/elasticsearch_adapter')	
@@ -178,9 +179,9 @@ const appsModule = new Proxy({
 	},
 });
 
-module.exports = {
+module.exports =  {
 	init,
 	config,
 	apps: appsModule,
-	db: Services.datasource
+	db: Services
 };
