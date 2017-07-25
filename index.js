@@ -1,3 +1,6 @@
+/**
+ * + db pe models
+ */
 const async = require('async'),
 	   redis = require('redis'),
 	   fs = require('fs');
@@ -7,17 +10,17 @@ const Application = require('./lib/Application'),
 	TelepatLogger = require('./lib/logger/logger'),
 	Services = require('./lib/Services'),
 	SystemMessageProcessor = require('./lib/systemMessage'),
-	FilterBuilder = require('./utils/filterbuilder').FilterBuilder,
+	Admin = require('./lib/Admin'), 
 	Model = require('./lib/Model');
 let config;
 
 let acceptedServices = {
 	ElasticSearch: require('./lib/database/elasticsearch_adapter')	
-}
+};
 
 fs.readdirSync(__dirname+'/lib/message_queue').forEach((filename) => {
 	let filenameParts = filename.split('_');
-	if (filenameParts.pop() == 'queue.js') {
+	if (filenameParts.pop() === 'queue.js') {
 		acceptedServices[filenameParts.join('_')] = require('./lib/message_queue/'+filename);
 	}
 });
@@ -45,7 +48,7 @@ const init = (name, callback) => {
 		},
 		seriesCallback => {
 			if (config.logger) {
-				config.logger.name = name +(process.env.PORT || 3000);
+				config.logger.name = name;
 				Services.logger = new TelepatLogger(config.logger);
 			} else {
 				Services.logger = new TelepatLogger({
@@ -57,7 +60,7 @@ const init = (name, callback) => {
 			let mainDatabase = config.main_database;
 		
 			if (!acceptedServices[mainDatabase]) {
-				Services.logger.emergency('Unable to load "' + mainDatabase + '" main database: not found. Aborting...');
+				seriesCallback(new Error('Unable to load "' + mainDatabase + '" main database: not found. Aborting...', 2))
 				process.exit(2);
 			}
 			
@@ -134,9 +137,8 @@ const init = (name, callback) => {
 			let clientConfiguration = config[messagingClient];
 			
 			if (!acceptedServices[messagingClient]) {
-				Services.logger.error('Unable to load "'+messagingClient+'" messaging queue: not found. ' +
-				'Aborting...');
-				process.exit(5);
+				seriesCallback(new Error('Unable to load "'+messagingClient+'" messaging queue: not found. ' +
+				'Aborting...', 5));
 			}
 
 			clientConfiguration = clientConfiguration || {broadcast: false};
@@ -166,7 +168,6 @@ const appsModule = new Proxy({
 	new: Application.new, 
 	get: Application.get,
 	getAll: Application.getAll,
-	models: Model
 }, {
 	get: (object, prop) => {
 		if (!config) {
@@ -183,5 +184,6 @@ module.exports =  {
 	init,
 	config,
 	apps: appsModule,
-	db: Services
+	admins: Admin,
+	models: Model
 };
