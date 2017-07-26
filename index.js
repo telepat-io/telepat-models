@@ -1,6 +1,5 @@
-/**
- * + db pe models
- */
+'use strict';
+
 const async = require('async'),
 	   redis = require('redis'),
 	   fs = require('fs');
@@ -11,7 +10,9 @@ const Application = require('./lib/Application'),
 	Services = require('./lib/Services'),
 	SystemMessageProcessor = require('./lib/systemMessage'),
 	Admin = require('./lib/Admin'), 
-	Model = require('./lib/Model');
+	Model = require('./lib/Model'),
+	Context = require('./lib/Context'),
+	User = require('./lib/User');
 let config;
 
 let acceptedServices = {
@@ -157,8 +158,10 @@ const init = (name, callback) => {
 				});
 				seriesCallback();
 			});
+		},
+		seriesCallback => {
+			Application.getAll(null, null, seriesCallback); 
 		}
-		
 	], callback);
 
 
@@ -167,7 +170,6 @@ const init = (name, callback) => {
 const appsModule = new Proxy({
 	new: Application.new, 
 	get: Application.get,
-	getAll: Application.getAll,
 }, {
 	get: (object, prop) => {
 		if (!config) {
@@ -185,5 +187,7 @@ module.exports =  {
 	config,
 	apps: appsModule,
 	admins: Admin,
-	models: Model
+	models: Model,
+	contexts: Context,
+	users: User
 };
