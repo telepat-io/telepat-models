@@ -1,8 +1,8 @@
 'use strict';
 
 const async = require('async'),
-	   redis = require('redis'),
-	   fs = require('fs');
+	redis = require('redis'),
+	fs = require('fs');
 const Application = require('./lib/Application'),
 	ConfigurationManager = require('./lib/ConfigurationManager'),
 	Datasource = require('./lib/database/datasource'),
@@ -61,7 +61,7 @@ const init = (name, callback) => {
 			let mainDatabase = config.main_database;
 		
 			if (!acceptedServices[mainDatabase]) {
-				seriesCallback(new Error('Unable to load "' + mainDatabase + '" main database: not found. Aborting...', 2))
+				seriesCallback(new Error('Unable to load "' + mainDatabase + '" main database: not found. Aborting...', 2));
 				process.exit(2);
 			}
 			
@@ -160,7 +160,7 @@ const init = (name, callback) => {
 			});
 		},
 		seriesCallback => {
-			Application.getAll(null, null, seriesCallback); 
+			Application.getAll(seriesCallback); 
 		}
 	], callback);
 
@@ -170,6 +170,10 @@ const init = (name, callback) => {
 const appsModule = new Proxy({
 	new: Application.new, 
 	get: Application.get,
+	models: Model, 
+	contexts: Context, 
+	users: User, 
+	getIds: Application.getIds,
 }, {
 	get: (object, prop) => {
 		if (!config) {
@@ -187,7 +191,4 @@ module.exports =  {
 	config,
 	apps: appsModule,
 	admins: Admin,
-	models: Model,
-	contexts: Context,
-	users: User
 };
