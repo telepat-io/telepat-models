@@ -12,7 +12,11 @@ const Application = require('./lib/Application'),
 	Admin = require('./lib/Admin'), 
 	Model = require('./lib/Model'),
 	Context = require('./lib/Context'),
-	User = require('./lib/User');
+	TelepatError = require('./lib/TelepatError'), 
+	User = require('./lib/User'),
+	Delta = require('./lib/Delta'), 
+	Channel = require('./lib/Channel'), 
+	Subscription = require('./lib/Subscription');
 let config;
 
 let acceptedServices = {
@@ -186,9 +190,21 @@ const appsModule = new Proxy({
 	},
 });
 
+
 module.exports =  {
 	init,
 	config,
 	apps: appsModule,
 	admins: Admin,
+	error: (error) => {
+		return new TelepatError(TelepatError.errors[error]);
+	},
+	services: Services, 
+	TelepatError: TelepatError,
+	users:User, 
+	conexts: Context, 
+	subscription: Subscription, 
+	models: Model,
+	deltas: Delta, 
+	channel: Channel
 };
