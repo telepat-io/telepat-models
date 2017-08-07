@@ -63,7 +63,6 @@ const init = (name, callback) => {
 				});
 			}
 			let mainDatabase = config.main_database;
-		
 			if (!acceptedServices[mainDatabase]) {
 				seriesCallback(new Error('Unable to load "' + mainDatabase + '" main database: not found. Aborting...', 2));
 				process.exit(2);
@@ -163,7 +162,9 @@ const init = (name, callback) => {
 				seriesCallback();
 			});
 		},
+		
 		seriesCallback => {
+			module.exports.config = config;
 			Application.getAll(seriesCallback); 
 		}
 	], callback);
@@ -177,12 +178,13 @@ const appsModule = new Proxy({
 	models: Model, 
 	contexts: Context, 
 	users: User, 
-	getIds: Application.getIds,
+	getIterator: () =>  Application.apps,
 }, {
 	get: (object, prop) => {
 		if (!config) {
 			throw new Error('Not initialized'); // TODO: improve
 		}
+		
 		if (typeof object[prop] === 'function') {
 			return object[prop];
 		}
@@ -197,14 +199,15 @@ module.exports =  {
 	apps: appsModule,
 	admins: Admin,
 	error: (error) => {
-		return new TelepatError(TelepatError.errors[error]);
+		return new TelepatError(error);
 	},
+	errors: TelepatError.errors,
 	services: Services, 
 	TelepatError: TelepatError,
 	users:User, 
-	conexts: Context, 
+	contexts: Context, 
 	subscription: Subscription, 
 	models: Model,
-	deltas: Delta, 
+	delta: Delta, 
 	channel: Channel
 };
