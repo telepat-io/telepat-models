@@ -9,24 +9,24 @@ const Application = require('./lib/Application'),
 	TelepatLogger = require('./lib/logger/logger'),
 	Services = require('./lib/Services'),
 	SystemMessageProcessor = require('./lib/systemMessage'),
-	Admin = require('./lib/Admin'), 
+	Admin = require('./lib/Admin'),
 	Model = require('./lib/Model'),
 	Context = require('./lib/Context'),
-	TelepatError = require('./lib/TelepatError'), 
+	TelepatError = require('./lib/TelepatError'),
 	User = require('./lib/User'),
-	Delta = require('./lib/Delta'), 
-	Channel = require('./lib/Channel'), 
+	Delta = require('./lib/Delta'),
+	Channel = require('./lib/Channel'),
 	Subscription = require('./lib/Subscription');
 let config;
 
 let acceptedServices = {
-	ElasticSearch: require('./lib/database/elasticsearch_adapter')	
+	ElasticSearch: require('./lib/database/elasticsearch_adapter')
 };
 
-fs.readdirSync(__dirname+'/lib/message_queue').forEach((filename) => {
+fs.readdirSync(__dirname + '/lib/message_queue').forEach((filename) => {
 	let filenameParts = filename.split('_');
 	if (filenameParts.pop() === 'queue.js') {
-		acceptedServices[filenameParts.join('_')] = require('./lib/message_queue/'+filename);
+		acceptedServices[filenameParts.join('_')] = require('./lib/message_queue/' + filename);
 	}
 });
 
@@ -58,8 +58,8 @@ const init = (name, callback) => {
 			} else {
 				Services.logger = new TelepatLogger({
 					type: 'Console',
-					name: name+(process.env.PORT || 3000),
-					settings: {level: 'info'}
+					name: name + (process.env.PORT || 3000),
+					settings: { level: 'info' }
 				});
 			}
 			let mainDatabase = config.main_database;
@@ -67,7 +67,7 @@ const init = (name, callback) => {
 				seriesCallback(new Error('Unable to load "' + mainDatabase + '" main database: not found. Aborting...', 2));
 				process.exit(2);
 			}
-			
+
 			Services.datasource = new Datasource();
 			Services.datasource.setMainDatabase(new acceptedServices[mainDatabase](config[mainDatabase]));
 			seriesCallback();
@@ -86,7 +86,7 @@ const init = (name, callback) => {
 				if (options.error && (options.error.code === 'ETIMEDOUT' || options.error.code === 'ECONNREFUSED'))
 					return 1000;
 
-				Services.logger.error('Redis server connection lost "'+redisConf.host+'". Retrying...');
+				Services.logger.error('Redis server connection lost "' + redisConf.host + '". Retrying...');
 				// reconnect after
 				return 3000;
 			};
@@ -104,7 +104,7 @@ const init = (name, callback) => {
 				Services.logger.info('Client connected to Redis.');
 				seriesCallback();
 			});
-		}, 
+		},
 		seriesCallback => {
 			if (Services.redisCacheClient) {
 				Services.redisCacheClient = null;
@@ -115,7 +115,7 @@ const init = (name, callback) => {
 				if (options.error && (options.error.code === 'ETIMEDOUT' || options.error.code === 'ECONNREFUSED'))
 					return 1000;
 
-				Services.logger.error('Redis cache server connection lost "'+redisCacheConf.host+'". Retrying...');
+				Services.logger.error('Redis cache server connection lost "' + redisCacheConf.host + '". Retrying...');
 
 				// reconnect after
 				return 3000;
@@ -136,78 +136,96 @@ const init = (name, callback) => {
 			});
 		},
 		seriesCallback => {
-			name = 'api';
-			let messagingClient = config.message_queue;
-			let clientConfiguration = config[messagingClient];
-			
-			if (!acceptedServices[messagingClient]) {
-				seriesCallback(new Error('Unable to load "'+messagingClient+'" messaging queue: not found. ' +
-				'Aborting...', 5));
-			}
+			if (name == 'api') {
+				let messagingClient = config.message_queue;
+				let clientConfiguration = config[messagingClient];
 
-			clientConfiguration = clientConfiguration || {broadcast: false};
-			/**
-			 * @type {MessagingClient}
-			 */
-			Services.messagingClient = new acceptedServices[messagingClient](clientConfiguration, 'telepat-'+name, name);
-			Services.messagingClient.onReady(() => {
-				Services.messagingClient.onMessage((message) => {
-					let parsedMessage = JSON.parse(message);
-					SystemMessageProcessor.identity = name;
-					if (parsedMessage._systemMessage) {
-						Services.logger.debug('Got system message: "'+message+'"');
-						SystemMessageProcessor.process(parsedMessage);
-					}
+				if (!acceptedServices[messagingClient]) {
+					seriesCallback(new Error('Unable to load "' + messagingClient + '" messaging queue: not found. ' +
+						'Aborting...', 5));
+				}
+
+				clientConfiguration = clientConfiguration || { broadcast: false };
+				/**
+				 * @type {MessagingClient}
+				 */
+				Services.messagingClient = new acceptedServices[messagingClient](clientConfiguration, 'telepat-' + name, name);
+				Services.messagingClient.onReady(() => {
+					Services.messagingClient.onMessage((message) => {
+						let parsedMessage = JSON.parse(message);
+						SystemMessageProcessor.identity = name;
+						if (parsedMessage._systemMessage) {
+							Services.logger.debug('Got system message: "' + message + '"');
+							SystemMessageProcessor.process(parsedMessage);
+						}
+					});
+					seriesCallback();
 				});
+			} else {
 				seriesCallback();
-			});
+			}
 		},
-		
+
 		seriesCallback => {
 			module.exports.config = config;
-			Application.getAll(seriesCallback); 
+			Application.getAll(seriesCallback);
 		}
 	], callback);
 
 
 };
+const workerInit = (theWorker, workerType, callback) => {
+	let messageQueueConfig = config[config.message_queue];
+	if (messageQueueConfig === undefined) {
+		messageQueueConfig = { broadcast: theWorker.broadcast, exclusive: theWorker.exclusive };
+	} else {
+		messageQueueConfig.broadcast = theWorker.broadcast;
+		messageQueueConfig.exclusive = theWorker.exclusive;
+	}
+	var messagingClient = new acceptedServices[config.message_queue](messageQueueConfig, theWorker.name, workerType);
+	Services.messagingClient = messagingClient;
+	messagingClient.onReady(callback);
+
+
+}
 
 const appsModule = new Proxy({
-	new: Application.new, 
+	new: Application.new,
 	get: Application.get,
-	models: Model, 
-	contexts: Context, 
-	users: User, 
-	getIterator: () =>  Application.apps,
+	models: Model,
+	contexts: Context,
+	users: User,
+	getIterator: () => Application.apps,
 }, {
-	get: (object, prop) => {
-		if (!config) {
-			throw new Error('Not initialized'); // TODO: improve
-		}
-		
-		if (typeof object[prop] === 'function') {
-			return object[prop];
-		}
-		return object.get(prop);
-	},
-});
+		get: (object, prop) => {
+			if (!config) {
+				throw new Error('Not initialized'); // TODO: improve
+			}
+
+			if (typeof object[prop] === 'function') {
+				return object[prop];
+			}
+			return object.get(prop);
+		},
+	});
 
 
-module.exports =  {
+module.exports = {
 	init,
 	config,
+	workerInit,
 	apps: appsModule,
 	admins: Admin,
 	error: (error) => {
 		return new TelepatError(error);
 	},
 	errors: TelepatError.errors,
-	services: Services, 
+	services: Services,
 	TelepatError: TelepatError,
-	users:User, 
-	contexts: Context, 
-	subscription: Subscription, 
+	users: User,
+	contexts: Context,
+	subscription: Subscription,
 	models: Model,
-	delta: Delta, 
+	delta: Delta,
 	channel: Channel
 };
