@@ -191,6 +191,7 @@ const appsModule = new Proxy({
 	new: Application.new,
 	get: Application.get,
 	isBuiltInModel: Application.isBuiltInModel,
+	isValidModel: Application.isValidModel,
 	models: Model,
 	contexts: Context,
 	users: User,
