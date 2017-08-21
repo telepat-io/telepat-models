@@ -18,6 +18,7 @@ const Application = require('./lib/Application'),
 	Channel = require('./lib/Channel'),
 	Subscription = require('./lib/Subscription');
 let config;
+//let TelepatIndexedList = require('./lib/TelepatIndexedList.js');
 
 let acceptedServices = {
 	ElasticSearch: require('./lib/database/elasticsearch_adapter')
@@ -31,7 +32,7 @@ fs.readdirSync(__dirname + '/lib/message_queue').forEach((filename) => {
 });
 
 
-const init = (name, callback) => {
+const init = (theWorker, name, callback) => {
 	let configManager = new ConfigurationManager('./config.spec.json', './config.json');
 	async.series([
 		seriesCallback => {
@@ -136,21 +137,35 @@ const init = (name, callback) => {
 			});
 		},
 		seriesCallback => {
-			if (name == 'api') {
-				let messagingClient = config.message_queue;
-				let clientConfiguration = config[messagingClient];
 
-				if (!acceptedServices[messagingClient]) {
-					seriesCallback(new Error('Unable to load "' + messagingClient + '" messaging queue: not found. ' +
-						'Aborting...', 5));
-				}
+			let messagingClient = config.message_queue;
+			let clientConfiguration = config[messagingClient];
 
+			if (!acceptedServices[messagingClient]) {
+				seriesCallback(new Error('Unable to load "' + messagingClient + '" messaging queue: not found. ' +
+					'Aborting...', 5));
+			}
+			let type;
+			if (!clientConfiguration && theWorker) {
+				clientConfiguration = { broadcast: theWorker.broadcast, exclusive: theWorker.exclusive };
+			} else if (theWorker) {
+				clientConfiguration.broadcast = theWorker.broadcast;
+				clientConfiguration.exclusive = theWorker.exclusive;
+				name = theWorker.name;
+				type = theWorker.type;
+			} else {
 				clientConfiguration = clientConfiguration || { broadcast: false };
-				/**
-				 * @type {MessagingClient}
-				 */
-				Services.messagingClient = new acceptedServices[messagingClient](clientConfiguration, 'telepat-' + name, name);
-				Services.messagingClient.onReady(() => {
+				type = name;
+			}
+			/**
+			 * @type {MessagingClient}
+			 */
+			Services.messagingClient = new acceptedServices[messagingClient](clientConfiguration, name, type);
+			if (theWorker) {
+
+			}
+			Services.messagingClient.onReady(() => {
+				if (!theWorker) {
 					Services.messagingClient.onMessage((message) => {
 						let parsedMessage = JSON.parse(message);
 						SystemMessageProcessor.identity = name;
@@ -159,13 +174,10 @@ const init = (name, callback) => {
 							SystemMessageProcessor.process(parsedMessage);
 						}
 					});
-					seriesCallback();
-				});
-			} else {
+				}
 				seriesCallback();
-			}
+			});
 		},
-
 		seriesCallback => {
 			module.exports.config = config;
 			Application.getAll(seriesCallback);
@@ -174,24 +186,11 @@ const init = (name, callback) => {
 
 
 };
-const workerInit = (theWorker, workerType, callback) => {
-	let messageQueueConfig = config[config.message_queue];
-	if (messageQueueConfig === undefined) {
-		messageQueueConfig = { broadcast: theWorker.broadcast, exclusive: theWorker.exclusive };
-	} else {
-		messageQueueConfig.broadcast = theWorker.broadcast;
-		messageQueueConfig.exclusive = theWorker.exclusive;
-	}
-	var messagingClient = new acceptedServices[config.message_queue](messageQueueConfig, theWorker.name, workerType);
-	Services.messagingClient = messagingClient;
-	messagingClient.onReady(callback);
-
-
-}
 
 const appsModule = new Proxy({
 	new: Application.new,
 	get: Application.get,
+	isBuiltInModel: Application.isBuiltInModel,
 	models: Model,
 	contexts: Context,
 	users: User,
@@ -213,7 +212,6 @@ const appsModule = new Proxy({
 module.exports = {
 	init,
 	config,
-	workerInit,
 	apps: appsModule,
 	admins: Admin,
 	error: (error) => {
@@ -227,5 +225,8 @@ module.exports = {
 	subscription: Subscription,
 	models: Model,
 	delta: Delta,
-	channel: Channel
+	channel: Channel,
+	SystemMessageProcessor: SystemMessageProcessor,
+	Application:Application, 
+	telepatIndexedList: require('./lib/TelepatIndexedLists')
 };
