@@ -18,7 +18,6 @@ const Application = require('./lib/Application'),
 	Channel = require('./lib/Channel'),
 	Subscription = require('./lib/Subscription');
 let config;
-//let TelepatIndexedList = require('./lib/TelepatIndexedList.js');
 
 let acceptedServices = {
 	ElasticSearch: require('./lib/database/elasticsearch_adapter')
@@ -30,7 +29,6 @@ fs.readdirSync(__dirname + '/lib/message_queue').forEach((filename) => {
 		acceptedServices[filenameParts.join('_')] = require('./lib/message_queue/' + filename);
 	}
 });
-
 
 const init = (theWorker, name, callback) => {
 	let configManager = new ConfigurationManager('./config.spec.json', './config.json');
@@ -64,6 +62,7 @@ const init = (theWorker, name, callback) => {
 				});
 			}
 			let mainDatabase = config.main_database;
+
 			if (!acceptedServices[mainDatabase]) {
 				seriesCallback(new Error('Unable to load "' + mainDatabase + '" main database: not found. Aborting...', 2));
 				process.exit(2);
@@ -82,6 +81,7 @@ const init = (theWorker, name, callback) => {
 			if (Services.redisClient) {
 				Services.redisClient = null;
 			}
+
 			let redisConf = config.redis;
 			let retry_strategy = (options) => {
 				if (options.error && (options.error.code === 'ETIMEDOUT' || options.error.code === 'ECONNREFUSED'))
@@ -137,15 +137,15 @@ const init = (theWorker, name, callback) => {
 			});
 		},
 		seriesCallback => {
-
 			let messagingClient = config.message_queue;
 			let clientConfiguration = config[messagingClient];
+			let type;
 
 			if (!acceptedServices[messagingClient]) {
 				seriesCallback(new Error('Unable to load "' + messagingClient + '" messaging queue: not found. ' +
 					'Aborting...', 5));
 			}
-			let type;
+
 			if (!clientConfiguration && theWorker) {
 				clientConfiguration = { broadcast: theWorker.broadcast, exclusive: theWorker.exclusive };
 			} else if (theWorker) {
@@ -161,13 +161,12 @@ const init = (theWorker, name, callback) => {
 			 * @type {MessagingClient}
 			 */
 			Services.messagingClient = new acceptedServices[messagingClient](clientConfiguration, name, type);
-			if (theWorker) {
 
-			}
 			Services.messagingClient.onReady(() => {
 				if (!theWorker) {
 					Services.messagingClient.onMessage((message) => {
 						let parsedMessage = JSON.parse(message);
+
 						SystemMessageProcessor.identity = name;
 						if (parsedMessage._systemMessage) {
 							Services.logger.debug('Got system message: "' + message + '"');
@@ -191,7 +190,6 @@ const appsModule = new Proxy({
 	new: Application.new,
 	get: Application.get,
 	isBuiltInModel: Application.isBuiltInModel,
-	isValidModel: Application.isValidModel,
 	models: Model,
 	contexts: Context,
 	users: User,
@@ -228,6 +226,10 @@ module.exports = {
 	delta: Delta,
 	channel: Channel,
 	SystemMessageProcessor: SystemMessageProcessor,
-	Application:Application, 
+	Application: Application,
 	telepatIndexedList: require('./lib/TelepatIndexedLists')
 };
+
+/* tlib.errors => new TLib.telepatError 
+	+validateObject  pe aplcation => (parent_id pe toate din belongs to + getParentInfo * ++ getParentInfo(verificat si continut) 
+	*/
