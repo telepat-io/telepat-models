@@ -30,8 +30,10 @@ fs.readdirSync(__dirname + '/lib/message_queue').forEach((filename) => {
 	}
 });
 
-const init = (theWorker, name, callback) => {
+const init = (servicesConfig, callback) => {
 	let configManager = new ConfigurationManager('./config.spec.json', './config.json');
+	let name = servicesConfig.name;
+
 	async.series([
 		seriesCallback => {
 			configManager.load(err => {
@@ -142,17 +144,17 @@ const init = (theWorker, name, callback) => {
 			let type;
 
 			if (!acceptedServices[messagingClient]) {
-				seriesCallback(new Error('Unable to load "' + messagingClient + '" messaging queue: not found. ' +
+				return seriesCallback(new Error('Unable to load "' + messagingClient + '" messaging queue: not found. ' +
 					'Aborting...', 5));
 			}
 
-			if (!clientConfiguration && theWorker) {
-				clientConfiguration = { broadcast: theWorker.broadcast, exclusive: theWorker.exclusive };
-			} else if (theWorker) {
-				clientConfiguration.broadcast = theWorker.broadcast;
-				clientConfiguration.exclusive = theWorker.exclusive;
-				name = theWorker.name;
-				type = theWorker.type;
+			if (!clientConfiguration && servicesConfig) {
+				clientConfiguration = { broadcast: servicesConfig.broadcast, exclusive: servicesConfig.exclusive };
+			} else if (servicesConfig) {
+				clientConfiguration.broadcast = servicesConfig.broadcast;
+				clientConfiguration.exclusive = servicesConfig.exclusive;
+				name = servicesConfig.name;
+				type = servicesConfig.type;
 			} else {
 				clientConfiguration = clientConfiguration || { broadcast: false };
 				type = name;
