@@ -157,8 +157,12 @@ const init = (theWorker, name, callback) => {
 				clientConfiguration = clientConfiguration || { broadcast: false };
 				type = name;
 			}
+			/**
+			 * @type {MessagingClient}
+			 */
+			Services.messagingClient = new acceptedServices[messagingClient](clientConfiguration, name, type);
 
-			Services.systemMessageFunc = function (message, callback) {
+			Services.messagingClient.systemMessageFunc = function (message, callback) {
 				SystemMessageProcessor.identity = name;
 				if (message._systemMessage) {
 					Services.logger.debug('Got system message: "' + JSON.stringify(message) + '"');
@@ -167,10 +171,6 @@ const init = (theWorker, name, callback) => {
 
 				callback(message);
 			}
-			/**
-			 * @type {MessagingClient}
-			 */
-			Services.messagingClient = new acceptedServices[messagingClient](clientConfiguration, name, type);
 
 			Services.messagingClient.onReady(seriesCallback);
 		},
