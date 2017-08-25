@@ -157,25 +157,22 @@ const init = (theWorker, name, callback) => {
 				clientConfiguration = clientConfiguration || { broadcast: false };
 				type = name;
 			}
+
+			Services.systemMessageFunc = function (message, callback) {
+				SystemMessageProcessor.identity = name;
+				if (message._systemMessage) {
+					Services.logger.debug('Got system message: "' + JSON.stringify(message) + '"');
+					SystemMessageProcessor.process(message);
+				}
+
+				callback(message);
+			}
 			/**
 			 * @type {MessagingClient}
 			 */
 			Services.messagingClient = new acceptedServices[messagingClient](clientConfiguration, name, type);
 
-			Services.messagingClient.onReady(() => {
-				if (!theWorker) {
-					Services.messagingClient.onMessage((message) => {
-						let parsedMessage = JSON.parse(message);
-
-						SystemMessageProcessor.identity = name;
-						if (parsedMessage._systemMessage) {
-							Services.logger.debug('Got system message: "' + message + '"');
-							SystemMessageProcessor.process(parsedMessage);
-						}
-					});
-				}
-				seriesCallback();
-			});
+			Services.messagingClient.onReady(seriesCallback);
 		},
 		seriesCallback => {
 			module.exports.config = config;
@@ -229,7 +226,3 @@ module.exports = {
 	Application: Application,
 	telepatIndexedList: require('./lib/TelepatIndexedLists')
 };
-
-/* tlib.errors => new TLib.telepatError 
-	+validateObject  pe aplcation => (parent_id pe toate din belongs to + getParentInfo * ++ getParentInfo(verificat si continut) 
-	*/
